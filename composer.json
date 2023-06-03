@@ -1,0 +1,6 @@
+{
+	"name": "plibv4/process",
+	"autoload": {
+        "classmap": ["src/"]
+    }
+}
