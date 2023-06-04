@@ -21,7 +21,13 @@ class Event {
 		posix_kill(posix_getpid(), SIGALRM);
 	}
 	
+	static function hasEvent(): bool {
+		return self::$event != NULL;
+	}
+	
 	static function receive(): Event {
-		return self::$event;
+		$event = self::$event;
+		self::$event = NULL;
+	return $event;
 	}
 }

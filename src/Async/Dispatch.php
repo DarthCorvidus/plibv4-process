@@ -4,9 +4,12 @@ class Dispatch {
 		;
 	}
 
-	function dispatch() {
-		$event = Event::receive();
-		$event->getElement()->triggerListener($event);
+	function dispatch($signal, $info) {
+		if(Event::hasEvent()) {
+			$event = Event::receive();
+			$event->getElement()->triggerListener($event);
+		return;
+		}
 	}
 	
 	static function init() {
