@@ -36,5 +36,11 @@ class SysVQueue {
 	function remove() {
 		msg_remove_queue($this->queue);
 	}
+	
+	function clear() {
+		while($this->hasMessage()) {
+			$this->getMessage();
+		}
+	}
 }
 
