@@ -8,6 +8,10 @@ class Process implements Element {
 		$this->runner = $runner;
 	}
 	
+	public function getRunnerName(): string {
+		return get_class($this->runner);
+	}
+	
 	public function getPid() {
 		return $this->pid;
 	}
@@ -32,6 +36,18 @@ class Process implements Element {
 		$this->listener = $listener;
 	}
 
+	public function sigStop() {
+		posix_kill($this->pid, SIGSTOP);
+	}
+	
+	public function sigCont() {
+		posix_kill($this->pid, SIGCONT);
+	}
+	
+	public function sigTerm() {
+		posix_kill($this->pid, SIGTERM);
+	}
+	
 	public function triggerListener(\Event $event) {
 		if($this->listener==NULL) {
 			return;
@@ -46,7 +62,6 @@ class Process implements Element {
 	}
 	
 	function run() {
-		echo "Parent Pid: ".posix_getpid().PHP_EOL;
 		$pid = pcntl_fork();
 		if($pid=="-1") {
 			throw new Exception("Unable to fork");
@@ -67,6 +82,17 @@ class Process implements Element {
 			 * user of this library.
 			 */
 			pcntl_signal(SIGCHLD, array("Process", "childHandler"));
+		}
+	}
+	
+	function runAndWait() {
+		$this->run();
+		$status = 0;
+		while(TRUE) {
+			$result = pcntl_waitpid($this->pid, $status, WNOHANG);
+			if($result == -1 or $result > 0) {
+				exit(0);
+			}
 		}
 	}
 }
