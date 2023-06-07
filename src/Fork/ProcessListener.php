@@ -1,5 +1,5 @@
 <?php
 interface ProcessListener {
-	function onStart(Event $event);
-	function onEnd(Event $event);
+	function onStart(Process $process);
+	function onEnd(Process $process);
 }

@@ -1,35 +1,39 @@
 <?php
-class Process implements Element {
+class Process implements SignalHandler {
 	private $runner;
 	private $listener;
 	private $pid;
+	private $signal;
+	private $paused = FALSE;
 	private static $stack = array();
 	function __construct(Runner $runner) {
 		$this->runner = $runner;
+		$this->signal = Signal::get();
+	}
+	
+	public function onSignal(int $signal, array $info) {
+		/**
+		 * SIGCHLD is sent on SIGSTOP/SIGCONT as well. We want to call onEnd
+		 * only when the process has exited.
+		 * TODO: the exit code should be used too.
+		 */
+		$result = pcntl_waitpid($this->pid, $status, WNOHANG);
+		if($result==$this->getPid() && $this->listener!=NULL) {
+			$this->listener->onEnd($this);
+		}
+		#print_r($info);
 	}
 	
 	public function getRunnerName(): string {
 		return get_class($this->runner);
 	}
 	
+	public function getRunner(): Runner {
+		return $this->runner;
+	}
+	
 	public function getPid() {
 		return $this->pid;
-	}
-	
-	private static function addStack(Process $process) {
-		self::$stack[$process->getPid()] = $process;
-	}
-	
-	static function getStack(): array {
-		return self::$stack;
-	}
-	
-	static function childHandler($sig, $info) {
-		$child = $info["pid"];
-		if(isset(Process::$stack[$child])) {
-			Event::send(new Event(Process::$stack[$child], "onEnd"));
-			unset(Process::$stack[$child]);
-		}
 	}
 	
 	function addProcessListener(ProcessListener $listener) {
@@ -67,13 +71,17 @@ class Process implements Element {
 			throw new Exception("Unable to fork");
 		}
 		if($pid==0) {
+			$this->signal->addSignalHandler(SIGTERM, $this);
 			$this->runner->run();
 			exit(0);
 		}
 		if($pid!==0) {
-			Event::send(new Event($this, "onStart"));
 			$this->pid = $pid;
-			Process::addStack($this);
+			if($this->listener!=NULL) {
+				$this->listener->onStart($this);
+			}
+			#Event::send(new Event($this, "onStart"));
+			#Process::addStack($this);
 			/*
 			 * Add a signal handler that reacts to SIGCHILD. This will overwrite
 			 * any existing signal handler - this does not matter regarding
@@ -81,7 +89,8 @@ class Process implements Element {
 			 * process, but it will of course overwrite any handler set by the
 			 * user of this library.
 			 */
-			pcntl_signal(SIGCHLD, array("Process", "childHandler"));
+			$this->signal->addSignalHandler(SIGCHLD, $this);
+			#pcntl_signal(SIGCHLD, array("Process", "childHandler"));
 		}
 	}
 	
