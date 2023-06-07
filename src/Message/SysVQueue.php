@@ -1,8 +1,23 @@
 <?php
-class SysVQueue {
+class SysVQueue implements SignalHandler {
 	private $queue;
+	private $listener;
 	function __construct(int $id) {
 		$this->queue = msg_get_queue($id);
+	}
+	
+	function addListener(Signal $signal, MessageListener $listener) {
+		$signal->addSignalHandler(SIGALRM, $this);
+		$this->listener = $listener;
+	}
+	
+	function onSignal(int $signal, array $info) {
+		if($this->hasMessage()) {
+			$message = $this->getMessage();
+			if($this->listener!=NULL) {
+				$this->listener->onMessage($message);
+			}
+		}
 	}
 	
 	function sendMessage(string $message, int $type) {
