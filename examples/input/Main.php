@@ -1,10 +1,12 @@
 <?php
-class Main implements ProcessListener {
+class Main implements ProcessListener, SignalHandler {
 	private $queue;
 	private $inputProcess;
+	private $signal;
 	public function __construct() {
 		#Dispatch::init();
-		pcntl_signal(SIGALRM, array($this, "onAlarm"));
+		$this->signal = Signal::get();
+		$this->signal->addSignalHandler(SIGALRM, $this);
 		pcntl_async_signals(true);
 		$this->queue = new SysVQueue(451);
 		$this->queue->clear();
@@ -13,16 +15,10 @@ class Main implements ProcessListener {
 		$this->inputProcess->addProcessListener($this);
 	}
 	
-	public function onAlarm(int $signal, array $info) {
-		if($this->queue->hasMessage()) {
+	public function onSignal(int $signal, array $info) {
+		if($this->queue->hasMessage() && $signal==SIGALRM) {
 			$this->onMessage($this->queue->getMessage());
 		}
-		if(Event::hasEvent()) {
-			$event = Event::receive();
-			$event->getElement()->triggerListener($event);
-		return;
-		}
-		
 	}
 	
 	/*
@@ -43,7 +39,7 @@ class Main implements ProcessListener {
 		}
 		if($message->getMessage()=="status") {
 			echo "PID:      ".posix_getpid().PHP_EOL;
-			echo "Children: ".count(Process::getStack()).PHP_EOL;
+			#echo "Children: ".count(Process::getStack()).PHP_EOL;
 			$this->inputProcess->sigCont();
 			return;
 		}
@@ -65,17 +61,17 @@ class Main implements ProcessListener {
 		$this->inputProcess->sigCont();
 	}
 	
-	public function onEnd(\Event $event) {
-		if($event->getElement()->getRunnerName()=="SleepRunner") {
-			echo "Process '".$event->getElement()->getRunnerName()."' with pid ".$event->getElement()->getPid()." ended.".PHP_EOL;
+	public function onEnd(Process $process) {
+		if($process->getRunnerName() instanceof SleepRunner) {
+			echo "Process '".$process->getRunnerName()."' with pid ".$process->getPid()." ended.".PHP_EOL;
 		}
 	}
 
-	public function onStart(\Event $event) {
-		if($event->getElement()->getRunnerName()=="SleepRunner") {
-			echo "Process sleep started.".PHP_EOL;
+	public function onStart(Process $process) {
+		if($process->getRunner() instanceof SleepRunner) {
+			echo "Process sleep started with pid ".$process->getPid().".".PHP_EOL;
 		}
-		if($event->getElement()->getRunnerName()=="InputRunner") {
+		if($process->getRunner() instanceof InputRunner) {
 			echo "Process input started.".PHP_EOL;
 		}
 	}
