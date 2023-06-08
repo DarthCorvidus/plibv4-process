@@ -83,6 +83,8 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 		$id = $process->getRunner()->getId();
 		echo "Thread for client ".$id." closed.".PHP_EOL;
 		socket_close($this->clients[$id]);
+		Signal::get()->clearHandler($process);
+		Signal::get()->clearHandler($process->getRunner()->getQueue());
 		unset($this->clients[$id]);
 	}
 

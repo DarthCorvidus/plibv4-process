@@ -10,6 +10,10 @@ class RunnerServer implements Runner, MessageListener {
 		$this->queue->addListener(Signal::get(), $this);
 	}
 	
+	function getQueue(): SysVQueue {
+		return $this->queue;
+	}
+	
 	function onMessage(\Message $message) {
 		$this->write($message->getMessage()).PHP_EOL;
 	}
