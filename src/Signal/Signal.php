@@ -38,6 +38,24 @@ class Signal {
 		$this->handlers[$signal] = array();
 		pcntl_signal($signal, SIG_DFL);
 	}
+	/**
+	 * Removes SignalHandler, either from a specific signal or all signals at
+	 * once.
+	 * @param SignalHandler $handler
+	 * @param int $signal
+	 */
+	function clearHandler(SignalHandler $handler, int $signal = NULL) {
+		foreach($this->handlers as $sig => $handlers) {
+			if($signal!==NULL && $sig!=$signal) {
+				continue;
+			}
+			foreach($handlers as $key => $value) {
+				if($handler==$value) {
+					unset($this->handlers[$sig][$key]);
+				}
+			}
+		}
+	}
 	
 	function call(int $signal, array $info) {
 		foreach($this->handlers[$signal] as $value) {
