@@ -66,6 +66,11 @@ class Process implements SignalHandler {
 		}
 	}
 	
+	/**
+	 * run() is fire and forget: the process is forked and run ends, so not to
+	 * block the parent process.
+	 * @throws Exception
+	 */
 	function run() {
 		$pid = pcntl_fork();
 		if($pid=="-1") {
@@ -94,7 +99,10 @@ class Process implements SignalHandler {
 			#pcntl_signal(SIGCHLD, array("Process", "childHandler"));
 		}
 	}
-	
+	/**
+	 * runAndWait spawns a thread and waits for it to finish, ie blocking the
+	 * calling process.
+	 */
 	function runAndWait() {
 		$this->run();
 		$status = 0;
