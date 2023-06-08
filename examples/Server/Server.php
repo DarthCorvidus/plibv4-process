@@ -1,11 +1,15 @@
 <?php
-class Server implements ProcessListener {
+class Server implements ProcessListener, MessageListener, SignalHandler {
 	private $socket;
 	private $clients = array();
+	private $queue;
 	function __construct() {
 		set_time_limit(0);
 		ob_implicit_flush();
 		pcntl_async_signals(true);
+		$signal = Signal::get();
+		$signal->addSignalHandler(SIGINT, $this);
+		$signal->addSignalHandler(SIGTERM, $this);
 		$address = '127.0.0.1';
 		$port = 4096;
 		if (($this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false) {
@@ -21,6 +25,14 @@ class Server implements ProcessListener {
 		}
 	}
 	
+	function onSignal(int $signal, array $info) {
+		if($signal==SIGINT or $signal==SIGTERM) {
+			socket_close($this->socket);
+			echo "Exiting.".PHP_EOL;
+			exit();
+		}
+	}
+	
 	private function onConnect($msgsock) {
 		$this->clients[] = $msgsock;
 		$keys = array_keys($this->clients, $msgsock);
@@ -28,6 +40,10 @@ class Server implements ProcessListener {
 		$process = new Process($runner);
 		$process->addProcessListener($this);
 		$process->run();
+	}
+	
+	function onMessage(\Message $message) {
+		;
 	}
 	
 	function run() {
