@@ -7,7 +7,7 @@ class Message {
 	function __construct(string $message) {
 		$this->message = $message;
 		$this->pid = posix_getpid();
-		$this->time = mktime();
+		$this->time = time();
 		$this->ppid = posix_getppid();
 	}
 	
