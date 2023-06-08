@@ -4,9 +4,10 @@ class Process implements SignalHandler {
 	private $listener;
 	private $pid;
 	private $signal;
-	private $paused = FALSE;
-	private static $stack = array();
 	function __construct(Runner $runner) {
+		if(pcntl_async_signals()!==TRUE) {
+			throw new ErrorException("Process needs pcntl_async_signal() to be TRUE.");
+		}
 		$this->runner = $runner;
 		$this->signal = Signal::get();
 	}
