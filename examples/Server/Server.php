@@ -10,6 +10,8 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 		$signal = Signal::get();
 		$signal->addSignalHandler(SIGINT, $this);
 		$signal->addSignalHandler(SIGTERM, $this);
+		$this->queue = new SysVQueue(ftok(__DIR__, "a"));
+		$this->queue->addListener($signal, $this);
 		$address = '127.0.0.1';
 		$port = 4096;
 		if (($this->socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false) {
@@ -43,7 +45,11 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 	}
 	
 	function onMessage(\Message $message) {
-		;
+		if($message->getMessage()=="status") {
+			$answer  = "";
+			$answer .= "Clients: ".count($this->clients).PHP_EOL;
+			$this->queue->sendHyperwave($answer, 1, $message->getSourcePID());
+		}
 	}
 	
 	function run() {

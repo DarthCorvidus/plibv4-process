@@ -1,10 +1,17 @@
 <?php
-class RunnerServer implements Runner {
+class RunnerServer implements Runner, MessageListener {
 	private $conn;
 	private $clientId;
+	private $queue;
 	function __construct($conn, int $clientId) {
 		$this->conn = $conn;
 		$this->clientId = $clientId;
+		$this->queue = new SysVQueue(ftok(__DIR__, "a"));
+		$this->queue->addListener(Signal::get(), $this);
+	}
+	
+	function onMessage(\Message $message) {
+		$this->write($message->getMessage()).PHP_EOL;
 	}
 	
 	function getId() {
@@ -25,12 +32,14 @@ class RunnerServer implements Runner {
 			$read[] = $this->conn;
 			$write = NULL;
 			$except = NULL;
-			if(socket_select($read, $write, $except, $tv_sec = 5) < 1) {
-				echo "No input from ".$this->clientId.PHP_EOL;
+			if(@socket_select($read, $write, $except, $tv_sec = 5) < 1) {
+				if(socket_last_error($this->conn)!==0) {
+					echo "socket_select() failed: ".socket_strerror(socket_last_error($this->conn)).PHP_EOL;
+				}
 				continue;
 			}
 			if(false === ($buf = socket_read($this->conn, 2048, PHP_NORMAL_READ))) {
-				echo "socket_read() failed: " . socket_strerror(socket_last_error($client)) . "\n";
+				echo "socket_read() failed: ".socket_strerror(socket_last_error($this->conn)).PHP_EOL;
 				return;
 			}
 			if(!$buf = trim($buf)) {
@@ -45,8 +54,14 @@ class RunnerServer implements Runner {
 				$message = "Going to sleep for 15 seconds!".PHP_EOL;
 				$this->write($message);
 				sleep(15);
+				$this->write("Woke up.").PHP_EOL;
 				continue;
 			}
+			
+			if($buf == "status") {
+				$this->queue->sendHyperwave("status", 1, posix_getppid());
+			}
+			
 			if($buf == "help") {
 				$message = "help - this help".PHP_EOL;
 				$message .= "status - print status".PHP_EOL;
