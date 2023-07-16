@@ -3,7 +3,9 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 	private $socket;
 	private $clients = array();
 	private $queue;
+	private $pool;
 	function __construct() {
+		$this->pool = new ProcessPool();
 		set_time_limit(0);
 		ob_implicit_flush();
 		pcntl_async_signals(true);
@@ -42,6 +44,7 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 		$process = new Process($runner);
 		$process->addProcessListener($this);
 		$process->run();
+		$this->pool->addProcess($keys[0], $process);
 	}
 	
 	function onMessage(\Message $message) {
@@ -81,6 +84,7 @@ class Server implements ProcessListener, MessageListener, SignalHandler {
 
 	public function onEnd(Process $process) {
 		$id = $process->getRunner()->getId();
+		$this->pool->removeProcess($id);
 		echo "Thread for client ".$id." closed.".PHP_EOL;
 		socket_close($this->clients[$id]);
 		Signal::get()->clearHandler($process);
