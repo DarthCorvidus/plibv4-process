@@ -86,4 +86,11 @@ class Timeshare implements Timeshared {
 			$value->terminate();
 		}
 	}
+	
+	public function run(): void {
+		while($this->loop()) {
+			
+		}
+	return;
+	}
 }

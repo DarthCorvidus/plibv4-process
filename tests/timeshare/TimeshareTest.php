@@ -18,4 +18,15 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count);
 		$this->assertEquals(1, $timeshare->getProcessCount());
 	}
+	
+	function testRun() {
+		$timeshare = new plibv4\Timeshare\Timeshare();
+		$count01 = new Counter(500);
+		$count02 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		$timeshare->run();
+		$this->assertEquals(500, $count01->getCount());
+		$this->assertEquals(1000, $count02->getCount());
+	}
 }

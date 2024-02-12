@@ -5,6 +5,11 @@ class Counter implements plibv4\Timeshare\Timeshared {
 	function __construct(int $max) {
 		$this->max = $max;
 	}
+	
+	public function getCount(): int {
+		return $this->count;
+	}
+	
 	public function finish(): void {
 		
 	}
