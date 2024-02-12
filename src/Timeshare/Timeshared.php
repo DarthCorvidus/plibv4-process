@@ -34,9 +34,11 @@ interface Timeshared {
 	/**
 	 * Process gets terminated from the outside. Process is expected to end in
 	 * an orderly manner.
-	 * @return void
+	 * Should return true if the instance is finished, return if it needs to
+	 * continue.
+	 * @return boolean True if done, false if not
 	 */
-	function terminate(): void;
+	function terminate(): bool;
 	/**
 	 * Process gets terminated from the outside, but is expected to end next to
 	 * immediately.

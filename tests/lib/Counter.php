@@ -22,12 +22,6 @@ class Counter implements plibv4\Timeshare\Timeshared {
 	}
 
 	public function loop(): bool {
-		if(!$this->active && $this->count == $this->max) {
-			return false;
-		}
-		if(!$this->active && $this->count % $this->modulo == 0) {
-			return false;
-		}
 		$this->count++;
 	return $this->count < $this->max;
 	}
@@ -44,7 +38,7 @@ class Counter implements plibv4\Timeshare\Timeshared {
 		
 	}
 
-	public function terminate(): void {
-		$this->active = false;
+	public function terminate(): bool {
+		return $this->count % $this->modulo == 0;
 	}
 }

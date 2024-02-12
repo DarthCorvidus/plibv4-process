@@ -79,8 +79,10 @@ class TimeshareTest extends TestCase {
 		$i = 0;
 		while($timeshare->loop()) {
 			$i++;
-			if($i == 94) {
-				$timeshare->terminate();
+			if($i >= 94) {
+				if($timeshare->terminate()) {
+					break;
+				}
 			}
 		}
 		$this->assertEquals(47, $count01->getCount());
