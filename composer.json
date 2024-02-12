@@ -7,8 +7,8 @@
 		"phpunit/phpunit": "^7"
 	},
 	"scripts": {
-		"test": "./vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
-		"testdox": "./vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox --colors=always tests"
+		"test": "./vendor/bin/phpunit --bootstrap tests/autoload.php tests",
+		"testdox": "./vendor/bin/phpunit --bootstrap tests/autoload.php --testdox --colors=always tests"
 	},
 	"config": {
 		"platform": {
