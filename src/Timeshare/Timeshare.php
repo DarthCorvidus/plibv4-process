@@ -1,6 +1,5 @@
 <?php
-namespace plibv4;
-namespace plibv4\Timeshare;
+namespace plibv4\process;
 class Timeshare implements Timeshared {
 	private array $timeshared = array();
 	private $pointer = 0;

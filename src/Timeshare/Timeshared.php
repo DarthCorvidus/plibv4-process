@@ -1,5 +1,5 @@
 <?php
-namespace plibv4\Timeshare;
+namespace plibv4\process;
 interface Timeshared {
 	/**
 	 * Regular, first start of process.
