@@ -15,10 +15,8 @@ class CounterTest extends TestCase {
 		$i = 0;
 		while($counter->loop()) {
 			$i++;
-			if($i == 245) {
-				if($counter->terminate()) {
-					break;
-				}
+			if($i == 245 && $counter->terminate()) {
+				break;
 			}
 		}
 		$this->assertEquals(245, $counter->getCount());
@@ -29,10 +27,8 @@ class CounterTest extends TestCase {
 		$i = 0;
 		while($counter->loop()) {
 			$i++;
-			if($i >= 245) {
-				if($counter->terminate()) {
-					break;
-				}
+			if($i >= 245 && $counter->terminate()) {
+				break;
 			}
 		}
 		$this->assertEquals(300, $counter->getCount());
