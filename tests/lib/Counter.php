@@ -2,9 +2,9 @@
 class Counter implements plibv4\process\Timeshared {
 	private int $max = 0;
 	private int $count = 0;
-	public bool $terminated = false;
-	public bool $started = false;
-	public bool $finished = false;
+	public int $terminated = 0;
+	public int $started = 0;
+	public int $finished = 0;
 	private int $modulo = 1;
 	function __construct(int $max, int $modulo = 1) {
 		$this->max = $max;
@@ -16,7 +16,7 @@ class Counter implements plibv4\process\Timeshared {
 	}
 
 	public function finish(): void {
-		
+		$this->finished++;
 	}
 
 	public function kill(): void {
@@ -37,10 +37,11 @@ class Counter implements plibv4\process\Timeshared {
 	}
 
 	public function start(): void {
-		
+		$this->started++;
 	}
 
 	public function terminate(): bool {
+		$this->terminated++;
 		return $this->count % $this->modulo == 0;
 	}
 }

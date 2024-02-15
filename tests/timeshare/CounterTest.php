@@ -8,6 +8,21 @@ class CounterTest extends TestCase {
 			
 		}
 		$this->assertEquals(500, $counter->getCount());
+		$this->assertEquals(false, $counter->terminated);
+	}
+	
+	function testStart() {
+		$counter = new Counter(500);
+		$this->assertEquals(0, $counter->started);
+		$counter->start();
+		$this->assertEquals(1, $counter->started);
+	}
+
+	function testFinish() {
+		$counter = new Counter(500);
+		$this->assertEquals(0, $counter->finished);
+		$counter->finish();
+		$this->assertEquals(1, $counter->finished);
 	}
 	
 	function testTerminate() {
@@ -20,6 +35,7 @@ class CounterTest extends TestCase {
 			}
 		}
 		$this->assertEquals(245, $counter->getCount());
+		$this->assertEquals(1, $counter->terminated);
 	}
 	
 	function testTerminateModulo() {
@@ -32,6 +48,8 @@ class CounterTest extends TestCase {
 			}
 		}
 		$this->assertEquals(300, $counter->getCount());
+		// Terminate is called 56 before 300 is reached and it returns false.
+		$this->assertEquals(56, $counter->terminated);
 	}
 	/**
 	 * Edge case: the max value has precedence over the next mod 100 value.
@@ -46,6 +64,8 @@ class CounterTest extends TestCase {
 			}
 		}
 		$this->assertEquals(250, $counter->getCount());
+		// Terminate is called 6 times before it returns false
+		$this->assertEquals(6, $counter->terminated);
 	}
 
 }
