@@ -3,17 +3,17 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 class TimeshareTest extends TestCase {
 	function testConstruct() {
-		$construct = new plibv4\Timeshare\Timeshare();
-		$this->assertInstanceOf(\plibv4\Timeshare\Timeshare::class, $construct);
+		$construct = new plibv4\process\Timeshare();
+		$this->assertInstanceOf(\plibv4\process\Timeshare::class, $construct);
 	}
 	
 	function testGetCountZero() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$this->assertEquals(0, $timeshare->getProcessCount());
 	}
 	
 	function testGetProcessCountAdded() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$count = new Counter(500);
 		$timeshare->addTimeshared($count);
 		$this->assertEquals(1, $timeshare->getProcessCount());
@@ -23,7 +23,7 @@ class TimeshareTest extends TestCase {
 	 * On each loop, one of the tasks is called in the order added to Timeshare.
 	 */
 	function testLoop() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000, 100);
 		$timeshare->addTimeshared($count01);
@@ -43,7 +43,7 @@ class TimeshareTest extends TestCase {
 	 * Run executes until loop() of every Timeshared instance returns false.
 	 */
 	function testRun() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000);
 		$timeshare->addTimeshared($count01);
@@ -54,7 +54,7 @@ class TimeshareTest extends TestCase {
 	}
 	
 	function testTerminate() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000);
 		$timeshare->addTimeshared($count01);
@@ -71,7 +71,7 @@ class TimeshareTest extends TestCase {
 	}
 
 	function testDeferredTerminate() {
-		$timeshare = new plibv4\Timeshare\Timeshare();
+		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000, 100);
 		$timeshare->addTimeshared($count01);

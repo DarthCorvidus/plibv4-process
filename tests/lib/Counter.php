@@ -1,8 +1,10 @@
 <?php
-class Counter implements plibv4\Timeshare\Timeshared {
+class Counter implements plibv4\process\Timeshared {
 	private int $max = 0;
 	private int $count = 0;
-	private bool $active = true;
+	public bool $terminated = false;
+	public bool $started = false;
+	public bool $finished = false;
 	private int $modulo = 1;
 	function __construct(int $max, int $modulo = 1) {
 		$this->max = $max;
@@ -12,7 +14,7 @@ class Counter implements plibv4\Timeshare\Timeshared {
 	public function getCount(): int {
 		return $this->count;
 	}
-	
+
 	public function finish(): void {
 		
 	}
