@@ -2,8 +2,9 @@
 namespace plibv4\process;
 class Timeshare implements Timeshared {
 	private array $timeshared = array();
-	private $pointer = 0;
-	private $count = 0;
+	private int $pointer = 0;
+	private int $count = 0;
+	private array $startStack = array();
 	function __construct() {
 		;
 	}
@@ -15,6 +16,7 @@ class Timeshare implements Timeshared {
 	function addTimeshared(Timeshared $timeshared) {
 		$this->timeshared[] = $timeshared;
 		$this->count = count($this->timeshared);
+		$this->startStack[] = $timeshared;
 	}
 	
 	function finish(): void {
@@ -35,6 +37,7 @@ class Timeshare implements Timeshared {
 			if($value==$timeshared) {
 				$this->pointer = -1;
 				$value->finish();
+				unset($this->startStack[$key]);
 				continue;
 			}
 			$new[] = $value;
@@ -53,6 +56,14 @@ class Timeshare implements Timeshared {
 	public function loop(): bool {
 		if(empty($this->timeshared)) {
 			return false;
+		}
+		/**
+		 * I don't like to have this in every loop, but for now I see no
+		 * better solution.
+		 */
+		if(isset($this->startStack[$this->pointer])) {
+			$this->startStack[$this->pointer]->start();
+			unset($this->startStack[$this->pointer]);
 		}
 		if($this->timeshared[$this->pointer]->loop()) {
 			$this->pointer++;

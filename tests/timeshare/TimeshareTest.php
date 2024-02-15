@@ -24,6 +24,7 @@ class TimeshareTest extends TestCase {
 	
 	/**
 	 * On each loop, one of the tasks is called in the order added to Timeshare.
+	 * Make sure that Timeshared::start is only called one time.
 	 */
 	function testLoop() {
 		$timeshare = new plibv4\process\Timeshare();
@@ -31,15 +32,22 @@ class TimeshareTest extends TestCase {
 		$count02 = new Counter(1000, 100);
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
+		$this->assertSame(0, $count01->started);
+		$this->assertSame(0, $count02->started);
 		$timeshare->loop();
 		$this->assertSame(1, $count01->getCount());
+		$this->assertSame(1, $count01->started);
 		$this->assertSame(0, $count02->getCount());
+		$this->assertSame(0, $count02->started);
 		$timeshare->loop();
 		$this->assertSame(1, $count01->getCount());
+		$this->assertSame(1, $count01->started);
 		$this->assertSame(1, $count02->getCount());
 		$timeshare->loop();
 		$this->assertSame(2, $count01->getCount());
 		$this->assertSame(1, $count02->getCount());
+		$this->assertSame(1, $count01->started);
+		$this->assertSame(1, $count01->started);
 	}
 	
 	/**
