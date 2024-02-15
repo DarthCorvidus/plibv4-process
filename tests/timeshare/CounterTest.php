@@ -8,7 +8,7 @@ class CounterTest extends TestCase {
 			
 		}
 		$this->assertEquals(500, $counter->getCount());
-		$this->assertEquals(false, $counter->terminated);
+		$this->assertEquals(0, $counter->terminated);
 	}
 	
 	function testStart() {
