@@ -9,14 +9,17 @@ class TimeshareTest extends TestCase {
 	
 	function testGetCountZero() {
 		$timeshare = new plibv4\process\Timeshare();
-		$this->assertEquals(0, $timeshare->getProcessCount());
+		$this->assertSame(0, $timeshare->getProcessCount());
 	}
 	
 	function testGetProcessCountAdded() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count = new Counter(500);
 		$timeshare->addTimeshared($count);
-		$this->assertEquals(1, $timeshare->getProcessCount());
+		$this->assertSame(1, $timeshare->getProcessCount());
+		$this->assertSame(0, $count->started);
+		$this->assertSame(0, $count->finished);
+		$this->assertSame(0, $count->terminated);
 	}
 	
 	/**
@@ -29,14 +32,14 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
 		$timeshare->loop();
-		$this->assertEquals(1, $count01->getCount());
-		$this->assertEquals(0, $count02->getCount());
+		$this->assertSame(1, $count01->getCount());
+		$this->assertSame(0, $count02->getCount());
 		$timeshare->loop();
-		$this->assertEquals(1, $count01->getCount());
-		$this->assertEquals(1, $count02->getCount());
+		$this->assertSame(1, $count01->getCount());
+		$this->assertSame(1, $count02->getCount());
 		$timeshare->loop();
-		$this->assertEquals(2, $count01->getCount());
-		$this->assertEquals(1, $count02->getCount());
+		$this->assertSame(2, $count01->getCount());
+		$this->assertSame(1, $count02->getCount());
 	}
 	
 	/**
@@ -49,8 +52,8 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
 		$timeshare->run();
-		$this->assertEquals(500, $count01->getCount());
-		$this->assertEquals(1000, $count02->getCount());
+		$this->assertSame(500, $count01->getCount());
+		$this->assertSame(1000, $count02->getCount());
 	}
 	
 	function testTerminate() {
@@ -66,8 +69,8 @@ class TimeshareTest extends TestCase {
 				$timeshare->terminate();
 			}
 		}
-		$this->assertEquals(47, $count01->getCount());
-		$this->assertEquals(47, $count02->getCount());
+		$this->assertSame(47, $count01->getCount());
+		$this->assertSame(47, $count02->getCount());
 	}
 
 	function testDeferredTerminate() {
@@ -83,8 +86,8 @@ class TimeshareTest extends TestCase {
 				break;
 			}
 		}
-		$this->assertEquals(47, $count01->getCount());
-		$this->assertEquals(100, $count02->getCount());
+		$this->assertSame(47, $count01->getCount());
+		$this->assertSame(100, $count02->getCount());
 	}
 
 }
