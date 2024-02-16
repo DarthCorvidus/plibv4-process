@@ -6,12 +6,13 @@ class Timeshare implements Timeshared {
 	private int $count = 0;
 	private array $startStack = array();
 	private bool $terminated = false;
+	private int $timeout = 30*1000000;
+	private int $terminatedAt = 0;
 	function __construct() {
-		;
 	}
 	
 	function setTimeout(int $seconds, int $microseconds) {
-		
+		$this->timeout = $seconds*1000000 + $microseconds;
 	}
 	
 	function getProcessCount() {
@@ -64,6 +65,10 @@ class Timeshare implements Timeshared {
 		if(empty($this->timeshared)) {
 			return false;
 		}
+		if($this->terminated && microtime(true)*1000000 - $this->terminatedAt >= $this->timeout ) {
+			$this->kill();
+		return false;
+		}
 		/**
 		 * I don't like to have this in every loop, but for now I see no
 		 * better solution.
@@ -108,6 +113,9 @@ class Timeshare implements Timeshared {
 	}
 
 	public function terminate(): bool {
+		if(!$this->terminated) {
+			$this->terminatedAt = microtime(true)*1000000;
+		}
 		$this->terminated = true;
 		foreach($this->timeshared as $value) {
 			if($value->terminate()) {

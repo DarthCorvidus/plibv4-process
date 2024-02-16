@@ -128,19 +128,33 @@ class TimeshareTest extends TestCase {
 		// Counter::terminate was deferred 54 times
 		$this->assertSame(54, $count02->terminated);
 	}
-	/*
+
 	function testTimeoutSeconds() {
 		$timeshare = new plibv4\process\Timeshare();
 		$timeshare->addTimeshared(new Stubborn());
 		$timeshare->setTimeout(1, 0);
 		$i = 0;
+		$started = microtime(true)*1000000;
 		while($timeshare->loop()) {
-			$i++;
-			if($i >= 94 and $timeshare->terminate()) {
-				break;
-			}
+			$timeshare->terminate();
 		}
+		$passed = microtime(true)*1000000 - $started;
+		$this->assertSame(true, $passed >= 0.9*1000000);
+		$this->assertSame(true, $passed <= 1.1*1000000);
 	}
-	 * 
-	 */
+	
+	function testTimeoutMicroeconds() {
+		$timeshare = new plibv4\process\Timeshare();
+		$timeshare->addTimeshared(new Stubborn());
+		$timeshare->setTimeout(0, 500000);
+		$i = 0;
+		$started = microtime(true)*1000000;
+		while($timeshare->loop()) {
+			$timeshare->terminate();
+		}
+		$passed = microtime(true)*1000000 - $started;
+		$this->assertSame(true, $passed >= 0.4*1000000);
+		$this->assertSame(true, $passed <= 0.6*1000000);
+	}
+
 }
