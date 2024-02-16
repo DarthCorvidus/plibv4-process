@@ -111,8 +111,8 @@ class TimeshareTest extends TestCase {
 		$i = 0;
 		while($timeshare->loop()) {
 			$i++;
-			if($i >= 94 and $timeshare->terminate()) {
-				break;
+			if($i == 94) {
+				$timeshare->terminate();
 			}
 		}
 		$this->assertSame(47, $count01->getCount());
@@ -128,5 +128,19 @@ class TimeshareTest extends TestCase {
 		// Counter::terminate was deferred 54 times
 		$this->assertSame(54, $count02->terminated);
 	}
-
+	/*
+	function testTimeoutSeconds() {
+		$timeshare = new plibv4\process\Timeshare();
+		$timeshare->addTimeshared(new Stubborn());
+		$timeshare->setTimeout(1, 0);
+		$i = 0;
+		while($timeshare->loop()) {
+			$i++;
+			if($i >= 94 and $timeshare->terminate()) {
+				break;
+			}
+		}
+	}
+	 * 
+	 */
 }

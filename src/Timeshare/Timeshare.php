@@ -5,8 +5,13 @@ class Timeshare implements Timeshared {
 	private int $pointer = 0;
 	private int $count = 0;
 	private array $startStack = array();
+	private bool $terminated = false;
 	function __construct() {
 		;
+	}
+	
+	function setTimeout(int $seconds, int $microseconds) {
+		
 	}
 	
 	function getProcessCount() {
@@ -75,6 +80,15 @@ class Timeshare implements Timeshared {
 		if($this->pointer==$this->count) {
 			$this->pointer = 0;
 		}
+		/*
+		 *  When Timeshare was terminated, try to terminate all processes on
+		 *  every loop.
+		 */
+		if($this->terminated) {
+			if($this->terminate()) {
+				return false;
+			}
+		}
 	return true;
 	}
 
@@ -94,6 +108,7 @@ class Timeshare implements Timeshared {
 	}
 
 	public function terminate(): bool {
+		$this->terminated = true;
 		foreach($this->timeshared as $value) {
 			if($value->terminate()) {
 				$this->remove($value, false);
