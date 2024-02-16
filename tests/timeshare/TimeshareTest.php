@@ -46,8 +46,9 @@ class TimeshareTest extends TestCase {
 		$timeshare->loop();
 		$this->assertSame(2, $count01->getCount());
 		$this->assertSame(1, $count02->getCount());
+		
 		$this->assertSame(1, $count01->started);
-		$this->assertSame(1, $count01->started);
+		$this->assertSame(1, $count02->started);
 	}
 	
 	/**
@@ -62,6 +63,16 @@ class TimeshareTest extends TestCase {
 		$timeshare->run();
 		$this->assertSame(500, $count01->getCount());
 		$this->assertSame(1000, $count02->getCount());
+		
+		$this->assertSame(1, $count01->started);
+		$this->assertSame(1, $count02->started);
+
+		$this->assertSame(1, $count01->finished);
+		$this->assertSame(1, $count02->finished);
+
+		$this->assertSame(0, $count01->terminated);
+		$this->assertSame(0, $count02->terminated);
+
 	}
 	
 	function testTerminate() {
@@ -79,6 +90,16 @@ class TimeshareTest extends TestCase {
 		}
 		$this->assertSame(47, $count01->getCount());
 		$this->assertSame(47, $count02->getCount());
+		
+		$this->assertSame(1, $count01->started);
+		$this->assertSame(1, $count02->started);
+
+		$this->assertSame(0, $count01->finished);
+		$this->assertSame(0, $count02->finished);
+
+		$this->assertSame(1, $count01->terminated);
+		$this->assertSame(1, $count02->terminated);
+
 	}
 
 	function testDeferredTerminate() {
@@ -96,6 +117,16 @@ class TimeshareTest extends TestCase {
 		}
 		$this->assertSame(47, $count01->getCount());
 		$this->assertSame(100, $count02->getCount());
+		
+		$this->assertSame(1, $count01->started);
+		$this->assertSame(1, $count02->started);
+
+		$this->assertSame(0, $count01->finished);
+		$this->assertSame(0, $count02->finished);
+
+		$this->assertSame(1, $count01->terminated);
+		// Counter::terminate was deferred 54 times
+		$this->assertSame(54, $count02->terminated);
 	}
 
 }

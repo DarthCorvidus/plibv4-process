@@ -30,13 +30,15 @@ class Timeshare implements Timeshared {
 		
 	}
 	
-	private function remove(Timeshared $timeshared) {
+	private function remove(Timeshared $timeshared, bool $finish = true) {
 		$new = array();
 		$i = 0;
 		foreach($this->timeshared as $key => $value) {
 			if($value==$timeshared) {
 				$this->pointer = -1;
-				$value->finish();
+				if($finish === true) {
+					$value->finish();
+				}
 				unset($this->startStack[$key]);
 				continue;
 			}
@@ -94,7 +96,7 @@ class Timeshare implements Timeshared {
 	public function terminate(): bool {
 		foreach($this->timeshared as $value) {
 			if($value->terminate()) {
-				$this->remove($value);
+				$this->remove($value, false);
 			}
 		}
 	return empty($this->timeshared);
