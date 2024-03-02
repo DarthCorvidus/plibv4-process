@@ -8,7 +8,15 @@ class Timeshare implements Timeshared {
 	private bool $terminated = false;
 	private int $timeout = 30*1000000;
 	private int $terminatedAt = 0;
+	private array $timeshareObservers = array();
 	function __construct() {
+	}
+	
+	function addTimeshareObserver(TimeshareObserver $observer): void {
+		if(array_search($observer, $this->timeshareObservers)!==false) {
+			return;
+		}
+		$this->timeshareObservers[] = $observer;
 	}
 	
 	function setTimeout(int $seconds, int $microseconds) {
@@ -23,6 +31,9 @@ class Timeshare implements Timeshared {
 		$this->timeshared[] = $timeshared;
 		$this->count = count($this->timeshared);
 		$this->startStack[] = $timeshared;
+		foreach($this->timeshareObservers as $value) {
+			$value->onAdd($this, $timeshared);
+		}
 	}
 	
 	function finish(): void {
@@ -36,13 +47,13 @@ class Timeshare implements Timeshared {
 		
 	}
 	
-	private function remove(Timeshared $timeshared, bool $finish = true) {
+	private function remove(Timeshared $timeshared, int $status) {
 		$new = array();
 		$i = 0;
 		foreach($this->timeshared as $key => $value) {
 			if($value==$timeshared) {
 				$this->pointer = -1;
-				if($finish === true) {
+				if($status === TimeshareObserver::FINISHED) {
 					$value->finish();
 				}
 				unset($this->startStack[$key]);
@@ -59,6 +70,9 @@ class Timeshare implements Timeshared {
 		}
 		$this->timeshared = $new;
 		$this->count = count($this->timeshared);
+		foreach($this->timeshareObservers as $value) {
+			$value->onRemove($this, $timeshared, $status);
+		}
 	}
 	
 	public function loop(): bool {
@@ -75,12 +89,15 @@ class Timeshare implements Timeshared {
 		 */
 		if(isset($this->startStack[$this->pointer])) {
 			$this->startStack[$this->pointer]->start();
+			foreach($this->timeshareObservers as $value) {
+				$value->onStart($this, $this->startStack[$this->pointer]);
+			}
 			unset($this->startStack[$this->pointer]);
 		}
 		if($this->timeshared[$this->pointer]->loop()) {
 			$this->pointer++;
 		} else {
-			$this->remove($this->timeshared[$this->pointer]);
+			$this->remove($this->timeshared[$this->pointer], TimeshareObserver::FINISHED);
 		}
 		if($this->pointer==$this->count) {
 			$this->pointer = 0;
@@ -119,7 +136,7 @@ class Timeshare implements Timeshared {
 		$this->terminated = true;
 		foreach($this->timeshared as $value) {
 			if($value->terminate()) {
-				$this->remove($value, false);
+				$this->remove($value, TimeshareObserver::TERMINATED);
 			}
 		}
 	return empty($this->timeshared);
