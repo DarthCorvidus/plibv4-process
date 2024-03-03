@@ -28,9 +28,9 @@ class Timeshare implements Timeshared {
 	}
 	
 	function addTimeshared(Timeshared $timeshared) {
-		$this->timeshared[] = $timeshared;
-		$this->count = count($this->timeshared);
-		$this->startStack[] = $timeshared;
+		$this->timeshared[$this->count] = $timeshared;
+		$this->startStack[$this->count] = $timeshared;
+		$this->count++;
 		foreach($this->timeshareObservers as $value) {
 			$value->onAdd($this, $timeshared);
 		}
@@ -47,15 +47,35 @@ class Timeshare implements Timeshared {
 		
 	}
 	
+	private function callStart() {
+		if(isset($this->startStack[$this->pointer])) {
+			$this->startStack[$this->pointer]->start();
+			foreach($this->timeshareObservers as $value) {
+				$value->onStart($this, $this->startStack[$this->pointer]);
+			}
+			unset($this->startStack[$this->pointer]);
+		}
+	}
+	
 	private function remove(Timeshared $timeshared, int $status) {
 		$new = array();
 		$i = 0;
+		/*
+		 * We do not remove an item using array_search/unset, but by rebuilding
+		 * a new array, so the keys are contiguous again.
+		 * The performance penalty of this approach should be negligible.
+		 */
 		foreach($this->timeshared as $key => $value) {
 			if($value==$timeshared) {
 				$this->pointer = -1;
 				if($status === TimeshareObserver::FINISHED) {
 					$value->finish();
 				}
+				/*
+				 * A task might be immediately removed after being added.
+				 * Therefore, it gets removed from the stack of tasks that
+				 * need to be started.
+				 */
 				unset($this->startStack[$key]);
 				continue;
 			}
@@ -79,6 +99,9 @@ class Timeshare implements Timeshared {
 		if(empty($this->timeshared)) {
 			return false;
 		}
+		/**
+		 * Implementation of timeout: run kill, then end.
+		 */
 		if($this->terminated && microtime(true)*1000000 - $this->terminatedAt >= $this->timeout ) {
 			$this->kill();
 		return false;
@@ -87,13 +110,8 @@ class Timeshare implements Timeshared {
 		 * I don't like to have this in every loop, but for now I see no
 		 * better solution.
 		 */
-		if(isset($this->startStack[$this->pointer])) {
-			$this->startStack[$this->pointer]->start();
-			foreach($this->timeshareObservers as $value) {
-				$value->onStart($this, $this->startStack[$this->pointer]);
-			}
-			unset($this->startStack[$this->pointer]);
-		}
+		$this->callStart();
+	
 		if($this->timeshared[$this->pointer]->loop()) {
 			$this->pointer++;
 		} else {

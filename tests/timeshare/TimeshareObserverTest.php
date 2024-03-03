@@ -63,6 +63,7 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$timeshare->addTimeshareObserver($this);
 		$count01 = new Counter(15);
 		$count02 = new Counter(20);
+		$count03 = new Counter(10);
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
 		$timeshare->loop();
@@ -73,7 +74,11 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 
 		$this->assertSame($count02, $this->lastStarted);
 		$this->assertSame(2, $this->startCount);
-
+		$timeshare->run();
+		$timeshare->addTimeshared($count03);
+		$timeshare->run();
+		$this->assertSame($count03, $this->lastStarted);
+		$this->assertSame(3, $this->startCount);
 	}
 	
 
