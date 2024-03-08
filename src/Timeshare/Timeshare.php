@@ -36,20 +36,20 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	function finish(): void {
+	function __tsFinish(): void {
 		foreach($this->timeshared as $value) {
 			$value->finish();
 		}
 		$this->timeshared = array();
 	}
 
-	public function start(): void {
+	public function __tsStart(): void {
 		
 	}
 	
 	private function callStart() {
 		if(isset($this->startStack[$this->pointer])) {
-			$this->startStack[$this->pointer]->start();
+			$this->startStack[$this->pointer]->__tsStart();
 			foreach($this->timeshareObservers as $value) {
 				$value->onStart($this, $this->startStack[$this->pointer]);
 			}
@@ -69,7 +69,7 @@ class Timeshare implements Timeshared {
 			if($value==$timeshared) {
 				$this->pointer = -1;
 				if($status === TimeshareObserver::FINISHED) {
-					$value->finish();
+					$value->__tsFinish();
 				}
 				/*
 				 * A task might be immediately removed after being added.
@@ -95,7 +95,7 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	public function loop(): bool {
+	public function __tsLoop(): bool {
 		if(empty($this->timeshared)) {
 			return false;
 		}
@@ -103,7 +103,7 @@ class Timeshare implements Timeshared {
 		 * Implementation of timeout: run kill, then end.
 		 */
 		if($this->terminated && microtime(true)*1000000 - $this->terminatedAt >= $this->timeout ) {
-			$this->kill();
+			$this->__tsKill();
 		return false;
 		}
 		/**
@@ -112,7 +112,7 @@ class Timeshare implements Timeshared {
 		 */
 		$this->callStart();
 	
-		if($this->timeshared[$this->pointer]->loop()) {
+		if($this->timeshared[$this->pointer]->__tsLoop()) {
 			$this->pointer++;
 		} else {
 			$this->remove($this->timeshared[$this->pointer], TimeshareObserver::FINISHED);
@@ -125,35 +125,35 @@ class Timeshare implements Timeshared {
 		 *  every loop.
 		 */
 		if($this->terminated) {
-			if($this->terminate()) {
+			if($this->__tsTerminate()) {
 				return false;
 			}
 		}
 	return true;
 	}
 
-	public function kill(): void {
+	public function __tsKill(): void {
 		foreach($this->timeshared as $value) {
-			$value->kill();
+			$value->__tsKill();
 		}
 		$this->timeshared = array();
 	}
 
-	public function pause(): void {
+	public function __tsPause(): void {
 		
 	}
 
-	public function resume(): void {
+	public function __tsResume(): void {
 		
 	}
 
-	public function terminate(): bool {
+	public function __tsTerminate(): bool {
 		if(!$this->terminated) {
 			$this->terminatedAt = microtime(true)*1000000;
 		}
 		$this->terminated = true;
 		foreach($this->timeshared as $value) {
-			if($value->terminate()) {
+			if($value->__tsTerminate()) {
 				$this->remove($value, TimeshareObserver::TERMINATED);
 			}
 		}
@@ -161,7 +161,7 @@ class Timeshare implements Timeshared {
 	}
 	
 	public function run(): void {
-		while($this->loop()) {
+		while($this->__tsLoop()) {
 			
 		}
 	return;

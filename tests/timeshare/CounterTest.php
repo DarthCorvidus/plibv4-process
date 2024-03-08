@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 class CounterTest extends TestCase {
 	function testCounter() {
 		$counter = new Counter(500);
-		while($counter->loop()) {
+		while($counter->__tsLoop()) {
 			
 		}
 		$this->assertSame(500, $counter->getCount());
@@ -14,23 +14,23 @@ class CounterTest extends TestCase {
 	function testStart() {
 		$counter = new Counter(500);
 		$this->assertSame(0, $counter->started);
-		$counter->start();
+		$counter->__tsStart();
 		$this->assertSame(1, $counter->started);
 	}
 
 	function testFinish() {
 		$counter = new Counter(500);
 		$this->assertSame(0, $counter->finished);
-		$counter->finish();
+		$counter->__tsFinish();
 		$this->assertSame(1, $counter->finished);
 	}
 	
 	function testTerminate() {
 		$counter = new Counter(500);
 		$i = 0;
-		while($counter->loop()) {
+		while($counter->__tsLoop()) {
 			$i++;
-			if($i == 245 && $counter->terminate()) {
+			if($i == 245 && $counter->__tsTerminate()) {
 				break;
 			}
 		}
@@ -41,9 +41,9 @@ class CounterTest extends TestCase {
 	function testTerminateModulo() {
 		$counter = new Counter(500, 100);
 		$i = 0;
-		while($counter->loop()) {
+		while($counter->__tsLoop()) {
 			$i++;
-			if($i >= 245 && $counter->terminate()) {
+			if($i >= 245 && $counter->__tsTerminate()) {
 				break;
 			}
 		}
@@ -57,10 +57,10 @@ class CounterTest extends TestCase {
 	function testTerminateEdgeCase() {
 		$counter = new Counter(250, 100);
 		$i = 0;
-		while($counter->loop()) {
+		while($counter->__tsLoop()) {
 			$i++;
 			if($i >= 245) {
-				$counter->terminate();
+				$counter->__tsTerminate();
 			}
 		}
 		$this->assertSame(250, $counter->getCount());

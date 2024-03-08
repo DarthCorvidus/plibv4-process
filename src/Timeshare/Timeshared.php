@@ -5,24 +5,24 @@ interface Timeshared {
 	 * Regular, first start of process.
 	 * @return void
 	 */
-	function start(): void;
+	function __tsStart(): void;
 	
 	/**
 	 * Central loop of the process. true if it should continue for another
 	 * round, false if it is done.
 	 * @return bool
 	 */
-	function loop(): bool;
+	function __tsLoop(): bool;
 	/**
 	 * Process will be paused, but may resume later.
 	 * @return void
 	 */
-	function pause(): void;
+	function __tsPause(): void;
 	/**
 	 * Process resumes from a pause
 	 * @return void
 	 */
-	function resume(): void;
+	function __tsResume(): void;
 	
 	/**
 	 * Process is finished. Although the process 'knows' by itself that it has
@@ -30,7 +30,7 @@ interface Timeshared {
 	 * any cleanup into finish() instead of cluttering up loop().
 	 * @return void
 	 */
-	function finish(): void;
+	function __tsFinish(): void;
 	/**
 	 * Process gets terminated from the outside. Process is expected to end in
 	 * an orderly manner.
@@ -38,11 +38,11 @@ interface Timeshared {
 	 * continue.
 	 * @return boolean True if done, false if not
 	 */
-	function terminate(): bool;
+	function __tsTerminate(): bool;
 	/**
 	 * Process gets terminated from the outside, but is expected to end next to
 	 * immediately.
 	 * @return void
 	 */
-	function kill(): void;
+	function __tsKill(): void;
 }

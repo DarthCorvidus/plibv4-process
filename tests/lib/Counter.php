@@ -15,32 +15,32 @@ class Counter implements plibv4\process\Timeshared {
 		return $this->count;
 	}
 
-	public function finish(): void {
+	public function __tsFinish(): void {
 		$this->finished++;
 	}
 
-	public function kill(): void {
+	public function __tsKill(): void {
 		
 	}
 
-	public function loop(): bool {
+	public function __tsLoop(): bool {
 		$this->count++;
 	return $this->count < $this->max;
 	}
 
-	public function pause(): void {
+	public function __tsPause(): void {
 		
 	}
 
-	public function resume(): void {
+	public function __tsResume(): void {
 		
 	}
 
-	public function start(): void {
+	public function __tsStart(): void {
 		$this->started++;
 	}
 
-	public function terminate(): bool {
+	public function __tsTerminate(): bool {
 		$this->terminated++;
 		return $this->count % $this->modulo == 0;
 	}

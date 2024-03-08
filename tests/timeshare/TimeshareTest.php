@@ -34,16 +34,16 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count02);
 		$this->assertSame(0, $count01->started);
 		$this->assertSame(0, $count02->started);
-		$timeshare->loop();
+		$timeshare->__tsLoop();
 		$this->assertSame(1, $count01->getCount());
 		$this->assertSame(1, $count01->started);
 		$this->assertSame(0, $count02->getCount());
 		$this->assertSame(0, $count02->started);
-		$timeshare->loop();
+		$timeshare->__tsLoop();
 		$this->assertSame(1, $count01->getCount());
 		$this->assertSame(1, $count01->started);
 		$this->assertSame(1, $count02->getCount());
-		$timeshare->loop();
+		$timeshare->__tsLoop();
 		$this->assertSame(2, $count01->getCount());
 		$this->assertSame(1, $count02->getCount());
 		
@@ -82,10 +82,10 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
 		$i = 0;
-		while($timeshare->loop()) {
+		while($timeshare->__tsLoop()) {
 			$i++;
 			if($i == 94) {
-				$timeshare->terminate();
+				$timeshare->__tsTerminate();
 			}
 		}
 		$this->assertSame(47, $count01->getCount());
@@ -109,10 +109,10 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTimeshared($count01);
 		$timeshare->addTimeshared($count02);
 		$i = 0;
-		while($timeshare->loop()) {
+		while($timeshare->__tsLoop()) {
 			$i++;
 			if($i == 94) {
-				$timeshare->terminate();
+				$timeshare->__tsTerminate();
 			}
 		}
 		$this->assertSame(47, $count01->getCount());
@@ -135,8 +135,8 @@ class TimeshareTest extends TestCase {
 		$timeshare->setTimeout(1, 0);
 		$i = 0;
 		$started = microtime(true)*1000000;
-		while($timeshare->loop()) {
-			$timeshare->terminate();
+		while($timeshare->__tsLoop()) {
+			$timeshare->__tsTerminate();
 		}
 		$passed = microtime(true)*1000000 - $started;
 		$this->assertSame(true, $passed >= 0.9*1000000);
@@ -149,8 +149,8 @@ class TimeshareTest extends TestCase {
 		$timeshare->setTimeout(0, 500000);
 		$i = 0;
 		$started = microtime(true)*1000000;
-		while($timeshare->loop()) {
-			$timeshare->terminate();
+		while($timeshare->__tsLoop()) {
+			$timeshare->__tsTerminate();
 		}
 		$passed = microtime(true)*1000000 - $started;
 		$this->assertSame(true, $passed >= 0.4*1000000);
