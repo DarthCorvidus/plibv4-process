@@ -6,9 +6,14 @@ class Counter implements plibv4\process\Timeshared {
 	public int $started = 0;
 	public int $finished = 0;
 	private int $modulo = 1;
+	private int $exceptionOn = 0;
 	function __construct(int $max, int $modulo = 1) {
 		$this->max = $max;
 		$this->modulo = $modulo;
+	}
+	
+	function exceptionOn(int $i) {
+		$this->exceptionOn = $i;
 	}
 	
 	public function getCount(): int {
@@ -25,6 +30,9 @@ class Counter implements plibv4\process\Timeshared {
 
 	public function __tsLoop(): bool {
 		$this->count++;
+		if($this->count == $this->exceptionOn) {
+			throw new RuntimeException("This exception is an expection.");
+		}
 	return $this->count < $this->max;
 	}
 

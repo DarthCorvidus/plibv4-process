@@ -68,4 +68,14 @@ class CounterTest extends TestCase {
 		$this->assertSame(5, $counter->terminated);
 	}
 
+	function testException() {
+		$counter = new Counter(250, 100);
+		$counter->exceptionOn(10);
+		for($i = 0; $i < 9;$i++) {
+			$counter->__tsLoop();
+		}
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("This exception is an expection.");
+		$counter->__tsLoop();
+	}
 }
