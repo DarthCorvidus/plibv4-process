@@ -68,7 +68,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(5, $counter->terminated);
 	}
 
-	function testException() {
+	function testExceptionLoop() {
 		$counter = new Counter(250, 100);
 		$counter->exceptionOn(10);
 		for($i = 0; $i < 9;$i++) {
@@ -78,4 +78,21 @@ class CounterTest extends TestCase {
 		$this->expectExceptionMessage("This exception is an expection.");
 		$counter->__tsLoop();
 	}
+	
+	function testExceptionStart() {
+		$counter = new Counter(250, 100);
+		$counter->exceptionStart = true;
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("exception at start");
+		$counter->__tsStart();
+	}
+
+	function testExceptionFinish() {
+		$counter = new Counter(250, 100);
+		$counter->exceptionFinish = true;
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("exception at finish.");
+		$counter->__tsFinish();
+	}
+
 }

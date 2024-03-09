@@ -78,6 +78,15 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
+	private function callFinish(Timeshared $timeshared) {
+		try {
+			$timeshared->__tsFinish();
+		} catch (\Exception $e) {
+			$timeshared->__tsError($e, Timeshare::FINISH);
+		return;
+		}
+	}
+	
 	private function remove(Timeshared $timeshared, int $status) {
 		$new = array();
 		$i = 0;
@@ -90,7 +99,7 @@ class Timeshare implements Timeshared {
 			if($value==$timeshared) {
 				$this->pointer = -1;
 				if($status === TimeshareObserver::FINISHED) {
-					$value->__tsFinish();
+					$this->callFinish($value);
 				}
 				/*
 				 * A task might be immediately removed after being added.

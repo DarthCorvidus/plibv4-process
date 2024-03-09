@@ -11,6 +11,7 @@ class Counter implements plibv4\process\Timeshared {
 	public Exception $exceptionReceived;
 	public int $exceptionStep = 0;
 	public bool $exceptionStart = false;
+	public bool $exceptionFinish = false;
 	function __construct(int $max, int $modulo = 1) {
 		$this->max = $max;
 		$this->modulo = $modulo;
@@ -25,6 +26,10 @@ class Counter implements plibv4\process\Timeshared {
 	}
 
 	public function __tsFinish(): void {
+		if($this->exceptionFinish) {
+			$this->exceptionThrown++;
+			throw new \RuntimeException("exception at finish.");
+		}
 		$this->finished++;
 	}
 
@@ -52,7 +57,7 @@ class Counter implements plibv4\process\Timeshared {
 	public function __tsStart(): void {
 		if($this->exceptionStart) {
 			$this->exceptionThrown++;
-			throw new \Exception("exception at start");
+			throw new \RuntimeException("exception at start");
 		}
 		$this->started++;
 	}

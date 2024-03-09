@@ -180,4 +180,17 @@ class TimeshareTest extends TestCase {
 		$this->assertSame("This exception is an expection.", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}
+
+	function testErrorFinish() {
+		$timeshare = new plibv4\process\Timeshare();
+		$count = new Counter(100);
+		$count->exceptionFinish = true;
+		$timeshare->addTimeshared($count);
+		$timeshare->run();
+		$this->assertSame(1, $count->exceptionThrown);
+		$this->assertSame(\plibv4\process\Timeshare::FINISH, $count->exceptionStep);
+		$this->assertSame("exception at finish.", $count->exceptionReceived->getMessage());
+		$this->assertSame(0, $count->finished);
+	}
+
 }
