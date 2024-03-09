@@ -110,10 +110,16 @@ class Timeshare implements Timeshared {
 	}
 
 	private function callLoop() {
-		if($this->timeshared[$this->pointer]->__tsLoop()) {
-			$this->pointer++;
-		} else {
-			$this->remove($this->timeshared[$this->pointer], TimeshareObserver::FINISHED);
+		$task = $this->timeshared[$this->pointer];
+		try {
+			if($task->__tsLoop()) {
+				$this->pointer++;
+			} else {
+				$this->remove($task, TimeshareObserver::FINISHED);
+			}
+		} catch (\Exception $e) {
+			$task->__tsError($e, TimeshareObserver::LOOP);
+			$this->remove($task, TimeshareObserver::ERROR);
 		}
 		if($this->pointer==$this->count) {
 			$this->pointer = 0;

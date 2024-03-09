@@ -51,6 +51,7 @@ class Counter implements plibv4\process\Timeshared {
 
 	public function __tsStart(): void {
 		if($this->exceptionStart) {
+			$this->exceptionThrown++;
 			throw new \Exception("exception at start");
 		}
 		$this->started++;
@@ -62,7 +63,6 @@ class Counter implements plibv4\process\Timeshared {
 	}
 	
 	public function __tsError(\Exception $e, int $step): void {
-		$this->exceptionThrown++;
 		$this->exceptionReceived = $e;
 		$this->exceptionStep = $step;
 	}
