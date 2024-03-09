@@ -49,7 +49,21 @@ class Timeshare implements Timeshared {
 	
 	private function callStart() {
 		if(isset($this->startStack[$this->pointer])) {
-			$this->startStack[$this->pointer]->__tsStart();
+			$task = $this->startStack[$this->pointer];
+			try {
+				$task->__tsStart();
+			} catch (\Exception $ex) {
+				# Here be onError observer
+				/*
+				 * call Timeshared::__tsError in case task has not realized
+				 * it is dead.
+				 */
+				$task->__tsError($ex, TimeshareObserver::START);
+				
+				$this->remove($task, TimeshareObserver::ERROR);
+			return;
+			}
+			
 			foreach($this->timeshareObservers as $value) {
 				$value->onStart($this, $this->startStack[$this->pointer]);
 			}
@@ -94,6 +108,17 @@ class Timeshare implements Timeshared {
 			$value->onRemove($this, $timeshared, $status);
 		}
 	}
+
+	private function callLoop() {
+		if($this->timeshared[$this->pointer]->__tsLoop()) {
+			$this->pointer++;
+		} else {
+			$this->remove($this->timeshared[$this->pointer], TimeshareObserver::FINISHED);
+		}
+		if($this->pointer==$this->count) {
+			$this->pointer = 0;
+		}
+	}
 	
 	public function __tsLoop(): bool {
 		if(empty($this->timeshared)) {
@@ -111,15 +136,18 @@ class Timeshare implements Timeshared {
 		 * better solution.
 		 */
 		$this->callStart();
-	
-		if($this->timeshared[$this->pointer]->__tsLoop()) {
-			$this->pointer++;
-		} else {
-			$this->remove($this->timeshared[$this->pointer], TimeshareObserver::FINISHED);
+		/**
+		 * CallStart can lead to an empty schedule, if the only task died on
+		 * __tsStart().
+		 */
+		if(empty($this->timeshared)) {
+			return false;
 		}
-		if($this->pointer==$this->count) {
-			$this->pointer = 0;
-		}
+
+		/**
+		 * calling __tsLoop as such.
+		 */
+		$this->callLoop();
 		/*
 		 *  When Timeshare was terminated, try to terminate all processes on
 		 *  every loop.

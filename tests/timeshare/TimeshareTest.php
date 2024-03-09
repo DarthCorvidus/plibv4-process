@@ -156,5 +156,15 @@ class TimeshareTest extends TestCase {
 		$this->assertSame(true, $passed >= 0.4*1000000);
 		$this->assertSame(true, $passed <= 0.6*1000000);
 	}
+	
+	function testErrorStart() {
+		$timeshare = new plibv4\process\Timeshare();
+		$count = new Counter(10);
+		$count->exceptionStart = true;
+		$timeshare->addTimeshared($count);
+		$timeshare->run();
+		$this->assertSame(1, $count->exceptionThrown);
+		$this->assertSame("exception at start", $count->exceptionReceived->getMessage());
+	}
 
 }

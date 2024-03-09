@@ -1,11 +1,12 @@
 <?php
 namespace plibv4\process;
 interface TimeshareObserver {
-	const FINISHED = 1;
-	const TERMINATED = 2;
-	const LOOP = 3;
-	const PAUSE = 4;
-	const RESUME = 5;
+	const START = 1;
+	const FINISHED = 2;
+	const TERMINATED = 3;
+	const LOOP = 4;
+	const PAUSE = 5;
+	const RESUME = 6;
 	const ERROR = 255;
 	function onAdd(Timeshare $timeshare, Timeshared $timeshared): void;
 	function onStart(Timeshare $timeshare, Timeshared $timeshared): void;
