@@ -45,4 +45,5 @@ interface Timeshared {
 	 * @return void
 	 */
 	function __tsKill(): void;
+	function __tsError(\Exception $e, int $step): void;
 }

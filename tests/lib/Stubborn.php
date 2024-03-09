@@ -27,4 +27,8 @@ class Stubborn implements \plibv4\process\Timeshared {
 	public function __tsTerminate(): bool {
 		return false;
 	}
+	
+	public function __tsError(\Exception $e, int $step): void {
+		;
+	}
 }

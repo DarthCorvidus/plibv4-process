@@ -166,4 +166,8 @@ class Timeshare implements Timeshared {
 		}
 	return;
 	}
+	
+	public function __tsError(\Exception $e, int $step): void {
+		throw $e;
+	}
 }
