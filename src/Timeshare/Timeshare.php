@@ -9,6 +9,13 @@ class Timeshare implements Timeshared {
 	private int $timeout = 30*1000000;
 	private int $terminatedAt = 0;
 	private array $timeshareObservers = array();
+	const START = 1;
+	const LOOP = 2;
+	const FINISH = 3;
+	const TERMINATE = 4;
+	const PAUSE = 5;
+	const RESUME = 6;
+	const ERROR = 255;
 	function __construct() {
 	}
 	
@@ -58,9 +65,9 @@ class Timeshare implements Timeshared {
 				 * call Timeshared::__tsError in case task has not realized
 				 * it is dead.
 				 */
-				$task->__tsError($ex, TimeshareObserver::START);
+				$task->__tsError($ex, Timeshare::START);
 				
-				$this->remove($task, TimeshareObserver::ERROR);
+				$this->remove($task, Timeshare::ERROR);
 			return;
 			}
 			
@@ -103,6 +110,7 @@ class Timeshare implements Timeshared {
 			$this->pointer = 0;
 		}
 		$this->timeshared = $new;
+		
 		$this->count = count($this->timeshared);
 		foreach($this->timeshareObservers as $value) {
 			$value->onRemove($this, $timeshared, $status);
@@ -118,8 +126,8 @@ class Timeshare implements Timeshared {
 				$this->remove($task, TimeshareObserver::FINISHED);
 			}
 		} catch (\Exception $e) {
-			$task->__tsError($e, TimeshareObserver::LOOP);
-			$this->remove($task, TimeshareObserver::ERROR);
+			$task->__tsError($e, Timeshare::LOOP);
+			$this->remove($task, Timeshare::ERROR);
 		}
 		if($this->pointer==$this->count) {
 			$this->pointer = 0;
