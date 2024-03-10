@@ -3,7 +3,8 @@ namespace plibv4\process;
 class Timeshare implements Timeshared {
 	private array $timeshared = array();
 	private int $pointer = 0;
-	private int $count = 0;
+	private int $allCount = 0;
+	private int $activeCount = 0;
 	private array $startStack = array();
 	private bool $terminated = false;
 	private int $timeout = 30*1000000;
@@ -31,13 +32,13 @@ class Timeshare implements Timeshared {
 	}
 	
 	function getProcessCount() {
-		return $this->count;
+		return $this->allCount;
 	}
 	
 	function addTimeshared(Timeshared $timeshared) {
-		$this->timeshared[$this->count] = $timeshared;
-		$this->startStack[$this->count] = $timeshared;
-		$this->count++;
+		#$this->timeshared[$this->count] = $timeshared;
+		$this->startStack[] = $timeshared;
+		$this->allCount++;
 		foreach($this->timeshareObservers as $value) {
 			$value->onAdd($this, $timeshared);
 		}
@@ -54,31 +55,34 @@ class Timeshare implements Timeshared {
 		
 	}
 	
-	private function callStart() {
-		if(isset($this->startStack[$this->pointer])) {
-			$task = $this->startStack[$this->pointer];
-			try {
-				$task->__tsStart();
-			} catch (\Exception $ex) {
-				# Here be onError observer
-				foreach($this->timeshareObservers as $value) {
-					$value->onError($this, $task, $ex, self::START);
-				}
-				/*
-				 * call Timeshared::__tsError in case task has not realized
-				 * it is dead.
-				 */
-				$task->__tsError($ex, Timeshare::START);
-				
-				$this->remove($task, Timeshare::ERROR);
-			return;
-			}
-			
-			foreach($this->timeshareObservers as $value) {
-				$value->onStart($this, $this->startStack[$this->pointer]);
-			}
-			unset($this->startStack[$this->pointer]);
+	private function callStart(): bool {
+		if(empty($this->startStack)) {
+			return false;
 		}
+		$task = array_shift($this->startStack);
+		try {
+			$task->__tsStart();
+			$this->timeshared[$this->activeCount] = $task;
+			$this->activeCount++;
+		} catch (\Exception $ex) {
+			# Here be onError observer
+			foreach($this->timeshareObservers as $value) {
+				$value->onError($this, $task, $ex, self::START);
+			}
+			/*
+			 * call Timeshared::__tsError in case task has not realized
+			 * it is dead.
+			 */
+			$task->__tsError($ex, Timeshare::START);
+
+			#$this->remove($task, Timeshare::ERROR);
+		return true;
+		}
+
+		foreach($this->timeshareObservers as $value) {
+			$value->onStart($this, $task);
+		}
+	return true;
 	}
 	
 	private function callFinish(Timeshared $timeshared) {
@@ -122,8 +126,7 @@ class Timeshare implements Timeshared {
 			$this->pointer = 0;
 		}
 		$this->timeshared = $new;
-		
-		$this->count = count($this->timeshared);
+		$this->activeCount = count($this->timeshared);
 		foreach($this->timeshareObservers as $value) {
 			$value->onRemove($this, $timeshared, $status);
 		}
@@ -141,13 +144,13 @@ class Timeshare implements Timeshared {
 			$task->__tsError($e, Timeshare::LOOP);
 			$this->remove($task, Timeshare::ERROR);
 		}
-		if($this->pointer==$this->count) {
+		if($this->pointer==$this->activeCount) {
 			$this->pointer = 0;
 		}
 	}
 	
 	public function __tsLoop(): bool {
-		if(empty($this->timeshared)) {
+		if(empty($this->timeshared) && empty($this->startStack)) {
 			return false;
 		}
 		/**
@@ -161,7 +164,9 @@ class Timeshare implements Timeshared {
 		 * I don't like to have this in every loop, but for now I see no
 		 * better solution.
 		 */
-		$this->callStart();
+		if($this->callStart()) {
+			return true;
+		}
 		/**
 		 * CallStart can lead to an empty schedule, if the only task died on
 		 * __tsStart().

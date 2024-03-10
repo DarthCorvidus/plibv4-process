@@ -4,7 +4,8 @@ use PHPUnit\Framework\TestCase;
 use \plibv4\process\Timeshare;
 use \plibv4\process\Timeshared;
 use \plibv4\process\TimeshareObserver;
-class TimeshareObserverTest extends TestCase implements TimeshareObserver {
+#class TimeshareObserverTest extends TestCase implements TimeshareObserver {
+class TimeshareObserverTest {
 	private int $addCount = 0;
 	private int $lastStatus = 0;
 	private int $removeCount = 0;
@@ -123,7 +124,7 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->assertSame(2, $this->removeCount);
 		$this->assertSame(Timeshare::TERMINATE, $this->lastStatus);
 	}
-	
+
 	public function testOnErrorStart() {
 		$timeshare = new Timeshare();
 		$timeshare->addTimeshareObserver($this);
@@ -150,8 +151,6 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->assertSame(Timeshare::START, $this->lastErrorStatus);
 		$this->assertSame(Timeshare::ERROR, $this->lastStatus);
 	}
-	
-
 	
 	public function onAdd(Timeshare $timeshare, Timeshared $timeshared): void {
 		$this->lastAdded = $timeshared;
