@@ -142,6 +142,9 @@ class Timeshare implements Timeshared {
 			}
 		} catch (\Exception $e) {
 			$task->__tsError($e, Timeshare::LOOP);
+			foreach($this->timeshareObservers as $value) {
+				$value->onError($this, $task, $e, Timeshare::LOOP);
+			}
 			$this->remove($task, Timeshare::ERROR);
 		}
 		if($this->pointer==$this->activeCount) {
