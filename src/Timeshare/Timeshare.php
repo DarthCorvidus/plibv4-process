@@ -98,7 +98,7 @@ class Timeshare implements Timeshared {
 		foreach($this->timeshared as $key => $value) {
 			if($value==$timeshared) {
 				$this->pointer = -1;
-				if($status === TimeshareObserver::FINISHED) {
+				if($status === Timeshare::FINISH) {
 					$this->callFinish($value);
 				}
 				/*
@@ -132,7 +132,7 @@ class Timeshare implements Timeshared {
 			if($task->__tsLoop()) {
 				$this->pointer++;
 			} else {
-				$this->remove($task, TimeshareObserver::FINISHED);
+				$this->remove($task, Timeshare::FINISH);
 			}
 		} catch (\Exception $e) {
 			$task->__tsError($e, Timeshare::LOOP);
@@ -205,7 +205,7 @@ class Timeshare implements Timeshared {
 		$this->terminated = true;
 		foreach($this->timeshared as $value) {
 			if($value->__tsTerminate()) {
-				$this->remove($value, TimeshareObserver::TERMINATED);
+				$this->remove($value, Timeshare::TERMINATE);
 			}
 		}
 	return empty($this->timeshared);
