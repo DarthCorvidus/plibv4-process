@@ -9,17 +9,23 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 	private int $lastStatus = 0;
 	private int $removeCount = 0;
 	private int $startCount = 0;
+	private int $errorCount = 0;
+	private int $lastErrorStatus = 0;
 	private ?Timeshared $lastAdded = null;
 	private ?Timeshared $lastRemoved = null;
 	private ?Timeshared $lastStarted = null;
+	private ?Timeshared $lastError = null;
+	private ?\Exception $lastException = null;
 	function tearDown(): void {
 		$this->addCount = 0;
 		$this->lastStatus = 0;
 		$this->removeCount = 0;
 		$this->startCount = 0;
+		$this->lastErrorStatus = 0;
 		$this->lastAdded = null;
 		$this->lastStarted = null;
 		$this->lastRemoved = null;
+		$this->lastException = null;
 	}
 	
 	public function testAddObserver() {
@@ -118,6 +124,32 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->assertSame(Timeshare::TERMINATE, $this->lastStatus);
 	}
 	
+	public function testOnErrorStart() {
+		$timeshare = new Timeshare();
+		$timeshare->addTimeshareObserver($this);
+		$count01 = new Counter(15);
+		$count01->exceptionStart = true;
+		$count02 = new Counter(20);
+		$count02->exceptionStart = true;
+		
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		$timeshare->__tsLoop();
+		$this->assertSame($count01, $this->lastError);
+		$this->assertSame(0, $count01->getCount());
+		$this->assertSame(1, $this->removeCount);
+		$this->assertSame(0, $this->startCount);
+		$this->assertSame(Timeshare::START, $this->lastErrorStatus);
+		$this->assertSame(Timeshare::ERROR, $this->lastStatus);
+
+		$timeshare->run();
+		$this->assertSame($count02, $this->lastError);
+		$this->assertSame(2, $this->removeCount);
+		$this->assertSame(0, $this->startCount);
+		$this->assertSame(0, $count02->getCount());
+		$this->assertSame(Timeshare::START, $this->lastErrorStatus);
+		$this->assertSame(Timeshare::ERROR, $this->lastStatus);
+	}
 	
 
 	
@@ -131,8 +163,10 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->startCount++;
 	}
 	
-	public function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $exception): void {
-		
+	public function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $exception, int $step): void {
+		$this->lastError = $timeshared;
+		$this->errorCount++;
+		$this->lastErrorStatus = $step;
 	}
 
 	public function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $status): void {

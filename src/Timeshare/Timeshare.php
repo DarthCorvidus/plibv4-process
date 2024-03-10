@@ -61,6 +61,9 @@ class Timeshare implements Timeshared {
 				$task->__tsStart();
 			} catch (\Exception $ex) {
 				# Here be onError observer
+				foreach($this->timeshareObservers as $value) {
+					$value->onError($this, $task, $ex, self::START);
+				}
 				/*
 				 * call Timeshared::__tsError in case task has not realized
 				 * it is dead.
