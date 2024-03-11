@@ -89,6 +89,9 @@ class Timeshare implements Timeshared {
 		try {
 			$timeshared->__tsFinish();
 		} catch (\Exception $e) {
+			foreach ($this->timeshareObservers as $value) {
+				$value->onError($this, $timeshared, $e, Timeshare::FINISH);
+			}
 			$timeshared->__tsError($e, Timeshare::FINISH);
 		return;
 		}

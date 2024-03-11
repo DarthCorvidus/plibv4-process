@@ -181,8 +181,40 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->assertSame(10, $count01->getCount());
 		$this->assertSame(13, $count02->getCount());
 		$this->assertSame(Timeshare::LOOP, $this->lastErrorStatus);
+
 	}
 	
+	public function testOnErrorFinish() {
+		$timeshare = new Timeshare();
+		$timeshare->addTimeshareObserver($this);
+		$count01 = new Counter(15);
+		$count01->exceptionFinish = true;
+		$count02 = new Counter(20);
+		$count02->exceptionFinish = true;
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		// 11 iterations to trigger the first error
+		for($i = 0; $i <= 15;$i++) {
+			$timeshare->__tsLoop();
+			$timeshare->__tsLoop();
+		}
+		$this->assertSame($count01, $this->lastError);
+		$this->assertSame($this->lastErrorStatus, Timeshare::FINISH);
+		$this->assertSame(2, $this->startCount);
+		$this->assertSame(15, $count01->getCount());
+		/**
+		 * Reset lastError and lastErrorStatus, then continue until Timeshare
+		 * finishes.
+		 */
+		$this->lastError = null;
+		$this->lastErrorStatus = 0;
+		$timeshare->run();
+		
+		$this->assertSame($count02, $this->lastError);
+		$this->assertSame(15, $count01->getCount());
+		$this->assertSame(20, $count02->getCount());
+		$this->assertSame(Timeshare::FINISH, $this->lastErrorStatus);
+	}	
 	public function onAdd(Timeshare $timeshare, Timeshared $timeshared): void {
 		$this->lastAdded = $timeshared;
 		$this->addCount++;
