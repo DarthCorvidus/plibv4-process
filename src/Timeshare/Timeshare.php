@@ -31,11 +31,11 @@ class Timeshare implements Timeshared {
 		$this->timeout = $seconds*1000000 + $microseconds;
 	}
 	
-	function getProcessCount() {
+	function getProcessCount(): int {
 		return $this->allCount;
 	}
 	
-	function addTimeshared(Timeshared $timeshared) {
+	function addTimeshared(Timeshared $timeshared): void {
 		#$this->timeshared[$this->count] = $timeshared;
 		$this->startStack[] = $timeshared;
 		$this->allCount++;
@@ -85,7 +85,7 @@ class Timeshare implements Timeshared {
 	return true;
 	}
 	
-	private function callFinish(Timeshared $timeshared) {
+	private function callFinish(Timeshared $timeshared): void {
 		try {
 			$timeshared->__tsFinish();
 		} catch (\Exception $e) {
@@ -97,7 +97,7 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	private function remove(Timeshared $timeshared, int $status) {
+	private function remove(Timeshared $timeshared, int $status): void {
 		$new = array();
 		$i = 0;
 		/*
@@ -135,7 +135,7 @@ class Timeshare implements Timeshared {
 		}
 	}
 
-	private function callLoop() {
+	private function callLoop(): void {
 		$task = $this->timeshared[$this->pointer];
 		try {
 			if($task->__tsLoop()) {
