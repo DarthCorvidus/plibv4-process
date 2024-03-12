@@ -9,7 +9,7 @@ class Timeshare implements Timeshared {
 	private bool $terminated = false;
 	private int $timeout = 30*1000000;
 	private int $terminatedAt = 0;
-	private array $timeshareObservers = array();
+	private TimeshareObservers $timeshareObservers;
 	const START = 1;
 	const LOOP = 2;
 	const FINISH = 3;
@@ -18,13 +18,14 @@ class Timeshare implements Timeshared {
 	const RESUME = 6;
 	const ERROR = 255;
 	function __construct() {
+		$this->timeshareObservers = new TimeshareObservers();
 	}
 	
 	function addTimeshareObserver(TimeshareObserver $observer): void {
-		if(array_search($observer, $this->timeshareObservers)!==false) {
-			return;
-		}
-		$this->timeshareObservers[] = $observer;
+		#if(array_search($observer, $this->timeshareObservers)!==false) {
+		#	return;
+		#}
+		$this->timeshareObservers->addTimeshareObserver($observer);
 	}
 	
 	function setTimeout(int $seconds, int $microseconds) {
@@ -39,9 +40,7 @@ class Timeshare implements Timeshared {
 		#$this->timeshared[$this->count] = $timeshared;
 		$this->startStack[] = $timeshared;
 		$this->allCount++;
-		foreach($this->timeshareObservers as $value) {
-			$value->onAdd($this, $timeshared);
-		}
+		$this->timeshareObservers->onAdd($this, $timeshared);
 	}
 	
 	function __tsFinish(): void {
@@ -66,9 +65,7 @@ class Timeshare implements Timeshared {
 			$this->activeCount++;
 		} catch (\Exception $ex) {
 			# Here be onError observer
-			foreach($this->timeshareObservers as $value) {
-				$value->onError($this, $task, $ex, self::START);
-			}
+			$this->timeshareObservers->onError($this, $task, $ex, self::START);
 			/*
 			 * call Timeshared::__tsError in case task has not realized
 			 * it is dead.
@@ -78,10 +75,7 @@ class Timeshare implements Timeshared {
 			#$this->remove($task, Timeshare::ERROR);
 		return true;
 		}
-
-		foreach($this->timeshareObservers as $value) {
-			$value->onStart($this, $task);
-		}
+		$this->timeshareObservers->onStart($this, $task);
 	return true;
 	}
 	
@@ -89,9 +83,7 @@ class Timeshare implements Timeshared {
 		try {
 			$timeshared->__tsFinish();
 		} catch (\Exception $e) {
-			foreach ($this->timeshareObservers as $value) {
-				$value->onError($this, $timeshared, $e, Timeshare::FINISH);
-			}
+			$this->timeshareObservers->onError($this, $timeshared, $e, Timeshare::FINISH);
 			$timeshared->__tsError($e, Timeshare::FINISH);
 		return;
 		}
@@ -130,9 +122,7 @@ class Timeshare implements Timeshared {
 		}
 		$this->timeshared = $new;
 		$this->activeCount = count($this->timeshared);
-		foreach($this->timeshareObservers as $value) {
-			$value->onRemove($this, $timeshared, $status);
-		}
+		$this->timeshareObservers->onRemove($this, $timeshared, $status);
 	}
 
 	private function callLoop(): void {
@@ -145,9 +135,7 @@ class Timeshare implements Timeshared {
 			}
 		} catch (\Exception $e) {
 			$task->__tsError($e, Timeshare::LOOP);
-			foreach($this->timeshareObservers as $value) {
-				$value->onError($this, $task, $e, Timeshare::LOOP);
-			}
+			$this->timeshareObservers->onError($this, $task, $e, Timeshare::LOOP);
 			$this->remove($task, Timeshare::ERROR);
 		}
 		if($this->pointer==$this->activeCount) {

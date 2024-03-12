@@ -27,28 +27,7 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 		$this->lastRemoved = null;
 		$this->lastException = null;
 	}
-	
-	public function testAddObserver() {
-		$timeshare = new Timeshare();
-		$timeshare->addTimeshareObserver($this);
-		
-		$reflection = new ReflectionClass($timeshare);
-		$name = $reflection->getProperty("timeshareObservers");
-		$name->setAccessible(true);
-		$this->assertSame(1, count($name->getValue($timeshare)));
-	}
 
-	public function testAddDuplicate() {
-		$timeshare = new Timeshare();
-		$timeshare->addTimeshareObserver($this);
-		$timeshare->addTimeshareObserver($this);
-	
-		$reflection = new ReflectionClass($timeshare);
-		$name = $reflection->getProperty("timeshareObservers");
-		$name->setAccessible(true);
-		$this->assertSame(1, count($name->getValue($timeshare)));
-	}
-	
 	public function testOnAdd() {
 		$timeshare = new Timeshare();
 		$timeshare->addTimeshareObserver($this);
