@@ -3,8 +3,7 @@ namespace plibv4\process;
 class Timeshare implements Timeshared {
 	private array $timeshared = array();
 	private int $pointer = 0;
-	private int $allCount = 0;
-	private int $activeCount = 0;
+	private int $count = 0;
 	private array $startStack = array();
 	private bool $terminated = false;
 	private int $timeout = 30*1000000;
@@ -33,14 +32,12 @@ class Timeshare implements Timeshared {
 	}
 	
 	function getProcessCount(): int {
-		return $this->allCount;
+		return $this->count;
 	}
 	
 	function addTimeshared(Timeshared $timeshared): void {
-		#$this->timeshared[$this->count] = $timeshared;
-		$this->startStack[] = $timeshared;
-		$this->allCount++;
-		$this->timeshareObservers->onAdd($this, $timeshared);
+		$this->timeshared[] = new TaskEnvelope($this, $timeshared, $this->timeshareObservers);
+		$this->count++;
 	}
 	
 	function __tsFinish(): void {
@@ -54,31 +51,6 @@ class Timeshare implements Timeshared {
 		
 	}
 	
-	private function callStart(): bool {
-		if(empty($this->startStack)) {
-			return false;
-		}
-		$task = array_shift($this->startStack);
-		try {
-			$task->__tsStart();
-			$this->timeshared[$this->activeCount] = $task;
-			$this->activeCount++;
-		} catch (\Exception $ex) {
-			# Here be onError observer
-			$this->timeshareObservers->onError($this, $task, $ex, self::START);
-			/*
-			 * call Timeshared::__tsError in case task has not realized
-			 * it is dead.
-			 */
-			$task->__tsError($ex, Timeshare::START);
-
-			#$this->remove($task, Timeshare::ERROR);
-		return true;
-		}
-		$this->timeshareObservers->onStart($this, $task);
-	return true;
-	}
-	
 	private function callFinish(Timeshared $timeshared): void {
 		try {
 			$timeshared->__tsFinish();
@@ -89,7 +61,7 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	private function remove(Timeshared $timeshared, int $status): void {
+	public function remove(Timeshared $timeshared, int $status): void {
 		$new = array();
 		$i = 0;
 		/*
@@ -98,10 +70,10 @@ class Timeshare implements Timeshared {
 		 * The performance penalty of this approach should be negligible.
 		 */
 		foreach($this->timeshared as $key => $value) {
-			if($value==$timeshared) {
+			if($value->getTimeshared()==$timeshared) {
 				$this->pointer = -1;
 				if($status === Timeshare::FINISH) {
-					$this->callFinish($value);
+					$this->callFinish($value->getTimeshared());
 				}
 				/*
 				 * A task might be immediately removed after being added.
@@ -121,24 +93,18 @@ class Timeshare implements Timeshared {
 			$this->pointer = 0;
 		}
 		$this->timeshared = $new;
-		$this->activeCount = count($this->timeshared);
+		$this->count = count($this->timeshared);
 		$this->timeshareObservers->onRemove($this, $timeshared, $status);
 	}
 
 	private function callLoop(): void {
 		$task = $this->timeshared[$this->pointer];
-		try {
-			if($task->__tsLoop()) {
-				$this->pointer++;
-			} else {
-				$this->remove($task, Timeshare::FINISH);
-			}
-		} catch (\Exception $e) {
-			$task->__tsError($e, Timeshare::LOOP);
-			$this->timeshareObservers->onError($this, $task, $e, Timeshare::LOOP);
-			$this->remove($task, Timeshare::ERROR);
+		if($task->__tsLoop()) {
+			$this->pointer++;
+		} else {
+			$this->remove($task->getTimeshared(), Timeshare::FINISH);
 		}
-		if($this->pointer==$this->activeCount) {
+		if($this->pointer==$this->count) {
 			$this->pointer = 0;
 		}
 	}
@@ -154,21 +120,6 @@ class Timeshare implements Timeshared {
 			$this->__tsKill();
 		return false;
 		}
-		/**
-		 * I don't like to have this in every loop, but for now I see no
-		 * better solution.
-		 */
-		if($this->callStart()) {
-			return true;
-		}
-		/**
-		 * CallStart can lead to an empty schedule, if the only task died on
-		 * __tsStart().
-		 */
-		if(empty($this->timeshared)) {
-			return false;
-		}
-
 		/**
 		 * calling __tsLoop as such.
 		 */
@@ -207,7 +158,7 @@ class Timeshare implements Timeshared {
 		$this->terminated = true;
 		foreach($this->timeshared as $value) {
 			if($value->__tsTerminate()) {
-				$this->remove($value, Timeshare::TERMINATE);
+				$this->remove($value->getTimeshared(), Timeshare::TERMINATE);
 			}
 		}
 	return empty($this->timeshared);
