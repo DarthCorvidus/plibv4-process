@@ -4,7 +4,6 @@ class Timeshare implements Timeshared {
 	private array $timeshared = array();
 	private int $pointer = 0;
 	private int $count = 0;
-	private array $startStack = array();
 	private bool $terminated = false;
 	private int $timeout = 30*1000000;
 	private int $terminatedAt = 0;
@@ -75,12 +74,6 @@ class Timeshare implements Timeshared {
 				if($status === Timeshare::FINISH) {
 					$this->callFinish($value->getTimeshared());
 				}
-				/*
-				 * A task might be immediately removed after being added.
-				 * Therefore, it gets removed from the stack of tasks that
-				 * need to be started.
-				 */
-				unset($this->startStack[$key]);
 				continue;
 			}
 			$new[] = $value;
@@ -110,7 +103,7 @@ class Timeshare implements Timeshared {
 	}
 	
 	public function __tsLoop(): bool {
-		if(empty($this->timeshared) && empty($this->startStack)) {
+		if(empty($this->timeshared)) {
 			return false;
 		}
 		/**
