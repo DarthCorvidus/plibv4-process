@@ -16,19 +16,19 @@ class TaskEnvelope {
 		return $this->task;
 	}
 	
-	function __tsLoop(): bool {
-		if(!$this->started) {
-			try {
-				$this->task->__tsStart();
-				$this->taskObservers->onStart($this->scheduler, $this->task);
-				$this->started = true;
-			} catch (\Exception $e) {
-				$this->task->__tsError($e, Timeshare::START);
-				$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::START);
-				$this->scheduler->remove($this->task, Timeshare::ERROR);
-			}
-		return true;
+	private function runStart(): void {
+		try {
+			$this->task->__tsStart();
+			$this->taskObservers->onStart($this->scheduler, $this->task);
+			$this->started = true;
+		} catch (\Exception $e) {
+			$this->task->__tsError($e, Timeshare::START);
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::START);
+			$this->scheduler->remove($this->task, Timeshare::ERROR);
 		}
+	}
+	
+	private function runLoop(): bool {
 		try {
 			$result = $this->task->__tsLoop();
 			return $result;
@@ -38,6 +38,14 @@ class TaskEnvelope {
 			$this->scheduler->remove($this->task, Timeshare::ERROR);
 		return false;
 		}
+	}
+	
+	function __tsLoop(): bool {
+		if(!$this->started) {
+			$this->runStart();
+		return true;
+		}
+	return $this->runLoop();
 	}
 
 	public function __tsError(\Exception $e, int $step): void {
