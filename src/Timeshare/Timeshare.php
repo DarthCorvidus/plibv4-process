@@ -30,6 +30,10 @@ class Timeshare implements Timeshared {
 		$this->timeout = $seconds*1000000 + $microseconds;
 	}
 	
+	function getTimeout(): int {
+		return $this->timeout;
+	}
+	
 	function getProcessCount(): int {
 		return $this->count;
 	}

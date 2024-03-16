@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
+use plibv4\process\Timeshare;
 class TimeshareTest extends TestCase {
 	function testConstruct() {
 		$construct = new plibv4\process\Timeshare();
@@ -12,7 +13,25 @@ class TimeshareTest extends TestCase {
 		$this->assertSame(0, $timeshare->getProcessCount());
 	}
 	
-	function xtestGetProcessCountAdded() {
+	function testGetTimeoutSeconds() {
+		$timeshare = new Timeshare();
+		$timeshare->setTimeout(20, 0);
+		$this->assertSame(20000000, $timeshare->getTimeout());
+	}
+
+	function testGetTimeoutMicroseconds() {
+		$timeshare = new Timeshare();
+		$timeshare->setTimeout(0, 150);
+		$this->assertSame(150, $timeshare->getTimeout());
+	}
+
+	function testGetTimeoutBoth() {
+		$timeshare = new Timeshare();
+		$timeshare->setTimeout(20, 150);
+		$this->assertSame(20000150, $timeshare->getTimeout());
+	}
+	
+	function testGetProcessCountAdded() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count = new Counter(500);
 		$timeshare->addTimeshared($count);
@@ -22,7 +41,7 @@ class TimeshareTest extends TestCase {
 		$this->assertSame(0, $count->terminated);
 	}
 	
-	function xtestStartProcess() {
+	function testStartProcess() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(500);
