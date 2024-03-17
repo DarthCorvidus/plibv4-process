@@ -119,7 +119,7 @@ class Timeshare implements Timeshared {
 
 	public function __tsKill(): void {
 		foreach($this->timeshared as $value) {
-			$value->__tsKill();
+			$value->kill();
 		}
 		$this->timeshared = array();
 	}
@@ -134,7 +134,7 @@ class Timeshare implements Timeshared {
 
 	public function __tsTerminate(): bool {
 		foreach($this->timeshared as $value) {
-			$value->__tsTerminate();
+			$value->terminate();
 		}
 	return false;
 	}
@@ -169,10 +169,10 @@ class Timeshare implements Timeshared {
 	}
 	
 	public function terminate(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->__tsTerminate();
+		$this->getTaskEnvelope($timeshared)->terminate();
 	}
 	
 	public function kill(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->__tsKill();
+		$this->getTaskEnvelope($timeshared)->kill();
 	}
 }

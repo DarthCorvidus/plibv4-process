@@ -46,7 +46,7 @@ class TaskEnvelope {
 	
 	private function runTerminate(): bool {
 		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
-			$this->__tsKill();
+			$this->kill();
 			$this->scheduler->remove($this->task, Timeshare::KILL);
 		return true;
 		}
@@ -68,28 +68,20 @@ class TaskEnvelope {
 	return $this->runLoop();
 	}
 
-	public function __tsFinish(): void {
-		$this->task->__tsFinish();
-	}
-
-	public function __tsKill(): void {
+	public function kill(): void {
 		$this->task->__tsKill();
 		$this->scheduler->remove($this->task, Timeshare::KILL);
 	}
 
-	public function __tsPause(): void {
+	public function pause(): void {
 		$this->task->__tsPause();
 	}
 
-	public function __tsResume(): void {
+	public function resume(): void {
 		$this->task->__tsResume();
 	}
 
-	public function __tsStart(): void {
-		$this->task->__tsStart();
-	}
-
-	public function __tsTerminate(): bool {
+	public function terminate(): bool {
 		if($this->terminatedAt == null) {
 			$this->terminatedAt = microtime(true)*1000000;
 		}
