@@ -3,8 +3,9 @@ namespace plibv4\process;
 class TaskEnvelope {
 	private Timeshared $task;
 	private Timeshare $scheduler;
-	private TimeshareObservers $timesharedObservers;
+	private TimeshareObservers $taskObservers;
 	private bool $started = false;
+	private ?int $terminatedAt = null;
 	function __construct(Timeshare $scheduler, Timeshared $task, TimeshareObservers $observers) {
 		$this->task = $task;
 		$this->taskObservers = $observers;
@@ -31,6 +32,9 @@ class TaskEnvelope {
 	private function runLoop(): bool {
 		try {
 			$result = $this->task->__tsLoop();
+			if($result == false) {
+				$this->scheduler->remove($this->task, Timeshare::FINISH);
+			}
 			return $result;
 		} catch (\Exception $e) {
 			$this->task->__tsError($e, Timeshare::LOOP);
@@ -40,7 +44,23 @@ class TaskEnvelope {
 		}
 	}
 	
+	private function runTerminate(): bool {
+		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
+			$this->__tsKill();
+			$this->scheduler->remove($this->task, Timeshare::KILL);
+		return true;
+		}
+		if($this->task->__tsTerminate()) {
+			$this->scheduler->remove($this->task, Timeshare::TERMINATE);
+		return true;
+		}
+	return false;
+	}
+	
 	function __tsLoop(): bool {
+		if($this->terminatedAt!==null && $this->runTerminate()) {
+			return false;
+		}
 		if(!$this->started) {
 			$this->runStart();
 		return true;
@@ -58,6 +78,7 @@ class TaskEnvelope {
 
 	public function __tsKill(): void {
 		$this->task->__tsKill();
+		$this->scheduler->remove($this->task, Timeshare::KILL);
 	}
 
 	public function __tsPause(): void {
@@ -73,6 +94,9 @@ class TaskEnvelope {
 	}
 
 	public function __tsTerminate(): bool {
-		return $this->task->__tsTerminate();
+		if($this->terminatedAt == null) {
+			$this->terminatedAt = microtime(true)*1000000;
+		}
+	return false;
 	}
 }

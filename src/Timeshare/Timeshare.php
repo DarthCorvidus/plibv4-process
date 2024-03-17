@@ -14,6 +14,7 @@ class Timeshare implements Timeshared {
 	const TERMINATE = 4;
 	const PAUSE = 5;
 	const RESUME = 6;
+	const KILL = 7;
 	const ERROR = 255;
 	function __construct() {
 		$this->timeshareObservers = new TimeshareObservers();
@@ -96,13 +97,15 @@ class Timeshare implements Timeshared {
 
 	private function callLoop(): void {
 		$task = $this->timeshared[$this->pointer];
+		/*
+		 * Increment the pointer only if __tsLoop evaluates to false, as the
+		 * task is removed otherwise within TaskEnvelope.
+		 */
 		if($task->__tsLoop()) {
 			$this->pointer++;
-		} else {
-			$this->remove($task->getTimeshared(), Timeshare::FINISH);
-		}
-		if($this->pointer==$this->count) {
-			$this->pointer = 0;
+			if($this->pointer==$this->count) {
+				$this->pointer = 0;
+			}
 		}
 	}
 	
@@ -110,26 +113,7 @@ class Timeshare implements Timeshared {
 		if(empty($this->timeshared)) {
 			return false;
 		}
-		/**
-		 * Implementation of timeout: run kill, then end.
-		 */
-		if($this->terminated && microtime(true)*1000000 - $this->terminatedAt >= $this->timeout ) {
-			$this->__tsKill();
-		return false;
-		}
-		/**
-		 * calling __tsLoop as such.
-		 */
 		$this->callLoop();
-		/*
-		 *  When Timeshare was terminated, try to terminate all processes on
-		 *  every loop.
-		 */
-		if($this->terminated) {
-			if($this->__tsTerminate()) {
-				return false;
-			}
-		}
 	return true;
 	}
 
@@ -149,16 +133,10 @@ class Timeshare implements Timeshared {
 	}
 
 	public function __tsTerminate(): bool {
-		if(!$this->terminated) {
-			$this->terminatedAt = microtime(true)*1000000;
-		}
-		$this->terminated = true;
 		foreach($this->timeshared as $value) {
-			if($value->__tsTerminate()) {
-				$this->remove($value->getTimeshared(), Timeshare::TERMINATE);
-			}
+			$value->__tsTerminate();
 		}
-	return empty($this->timeshared);
+	return false;
 	}
 	
 	public function run(): void {

@@ -97,8 +97,7 @@ class TimeshareObserverTest extends TestCase implements TimeshareObserver {
 			}
 			$i++;
 		}
-	
-		$this->assertSame($count02, $this->lastRemoved);
+		$this->assertSame($count01, $this->lastRemoved);
 		$this->assertSame(2, $this->removeCount);
 		$this->assertSame(Timeshare::TERMINATE, $this->lastStatus);
 	}
