@@ -57,7 +57,7 @@ class TaskEnvelope {
 	return false;
 	}
 	
-	function __tsLoop(): bool {
+	function loop(): bool {
 		if($this->terminatedAt!==null && $this->runTerminate()) {
 			return false;
 		}
@@ -66,10 +66,6 @@ class TaskEnvelope {
 		return true;
 		}
 	return $this->runLoop();
-	}
-
-	public function __tsError(\Exception $e, int $step): void {
-		$this->task->__tsError($e, $step);
 	}
 
 	public function __tsFinish(): void {

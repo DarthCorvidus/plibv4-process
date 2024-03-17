@@ -101,7 +101,7 @@ class Timeshare implements Timeshared {
 		 * Increment the pointer only if __tsLoop evaluates to false, as the
 		 * task is removed otherwise within TaskEnvelope.
 		 */
-		if($task->__tsLoop()) {
+		if($task->loop()) {
 			$this->pointer++;
 			if($this->pointer==$this->count) {
 				$this->pointer = 0;

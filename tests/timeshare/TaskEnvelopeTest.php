@@ -32,7 +32,7 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
-		$envelope->__tsLoop();
+		$envelope->loop();
 		$this->assertSame(1, $task->started);
 		$this->assertSame(1, $this->started);
 		$this->assertSame(0, $task->getCount());
@@ -45,7 +45,7 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		$task = new Counter(20);
 		$task->exceptionStart = true;
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
-		$envelope->__tsLoop();
+		$envelope->loop();
 		$this->assertSame(0, $task->started);
 		$this->assertSame(0, $this->started);
 		$this->assertSame(1, $this->errors);
@@ -60,8 +60,8 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
-		$envelope->__tsLoop();
-		$envelope->__tsLoop();
+		$envelope->loop();
+		$envelope->loop();
 		$this->assertSame(1, $task->started);
 		$this->assertSame(1, $task->getCount());
 	}
@@ -72,7 +72,7 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		$task = new Counter(20);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
 		$looped = 0;
-		while($envelope->__tsLoop()) {
+		while($envelope->loop()) {
 			$looped++;
 		}
 		/**
@@ -90,7 +90,7 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		$task = new Counter(20);
 		$task->exceptionOn(15);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
-		while($envelope->__tsLoop()) {
+		while($envelope->loop()) {
 			
 		}
 		$this->assertSame(1, $task->started);
