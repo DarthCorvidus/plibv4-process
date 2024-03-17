@@ -149,4 +149,30 @@ class Timeshare implements Timeshared {
 	public function __tsError(\Exception $e, int $step): void {
 		throw $e;
 	}
+	
+	public function hasTimeshared(Timeshared $timeshared): bool {
+		foreach($this->timeshared as $value) {
+			if($value->getTimeshared() === $timeshared) {
+				return true;
+			}
+		}
+	return false;
+	}
+	
+	private function getTaskEnvelope(Timeshared $timeshared): TaskEnvelope {
+		foreach($this->timeshared as $value) {
+			if($value->getTimeshared() === $timeshared) {
+				return $value;
+			}
+		}
+	throw new \RuntimeException("Task '". get_class($timeshared)."' not found in Scheduler '". get_class($this)."'");
+	}
+	
+	public function terminate(Timeshared $timeshared): void {
+		$this->getTaskEnvelope($timeshared)->__tsTerminate();
+	}
+	
+	public function kill(Timeshared $timeshared): void {
+		$this->getTaskEnvelope($timeshared)->__tsKill();
+	}
 }

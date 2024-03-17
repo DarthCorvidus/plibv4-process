@@ -122,7 +122,7 @@ class TimeshareTest extends TestCase {
 
 	}
 	
-	function testTerminate() {
+	function testTerminateAll() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000);
@@ -149,7 +149,7 @@ class TimeshareTest extends TestCase {
 
 	}
 
-	function testDeferredTerminate() {
+	function testDeferredTerminateAll() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000, 100);
@@ -239,5 +239,78 @@ class TimeshareTest extends TestCase {
 		$this->assertSame("exception at finish.", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}
+	
+	function testHasTimeshared() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500);
+		$count02 = new Counter(1000);
+		$count03 = new Counter(1000);
+		$count04 = new Counter(1500);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		$this->assertSame(true, $timeshare->hasTimeshared($count01));
+		$this->assertSame(true, $timeshare->hasTimeshared($count02));
+		$this->assertSame(false, $timeshare->hasTimeshared($count03));
+		$this->assertSame(false, $timeshare->hasTimeshared($count04));
+	}
+	
+	function testTerminate() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500);
+		$count02 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		$i = 0;
+		while($timeshare->__tsLoop()) {
+			$i++;
+			if($timeshare->hasTimeshared($count01) &&  $count01->getCount()==47) {
+				$timeshare->terminate($count01);
+			}
+		}
+		$this->assertSame(47, $count01->getCount());
+		$this->assertSame(1000, $count02->getCount());
+	}
 
+	function testDeferredTerminate() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500, 50);
+		$count02 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		while($timeshare->__tsLoop()) {
+			if($timeshare->hasTimeshared($count01) &&  $count01->getCount()==47) {
+				$timeshare->terminate($count01);
+			}
+		}
+		$this->assertSame(50, $count01->getCount());
+		$this->assertSame(1000, $count02->getCount());
+	}
+	
+	function testKill() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500, 50);
+		$count02 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		while($timeshare->__tsLoop()) {
+			if($timeshare->hasTimeshared($count01) && $count01->getCount()==47) {
+				$timeshare->kill($count01);
+			}
+		}
+		$this->assertSame(47, $count01->getCount());
+		$this->assertSame(1000, $count02->getCount());
+	}
+
+	function testKillUnavailableTask() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500, 50);
+		$count02 = new Counter(1000);
+		$count03 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		$timeshare->__tsLoop();
+		$this->expectException(\RuntimeException::class);
+		$this->expectExceptionMessage("Task 'Counter' not found in Scheduler 'plibv4\process\Timeshare'");
+		$timeshare->kill($count03);
+	}
 }
