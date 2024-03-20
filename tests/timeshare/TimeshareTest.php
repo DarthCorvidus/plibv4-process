@@ -313,4 +313,25 @@ class TimeshareTest extends TestCase {
 		$this->expectExceptionMessage("Task 'Counter' not found in Scheduler 'plibv4\process\Timeshare'");
 		$timeshare->kill($count03);
 	}
+	
+	function testPause() {
+		$timeshare = new Timeshare();
+		$count01 = new Counter(500);
+		$count02 = new Counter(1000);
+		$timeshare->addTimeshared($count01);
+		$timeshare->addTimeshared($count02);
+		for($i=0;$i<=10;$i++) {
+			$timeshare->__tsLoop();
+			$timeshare->__tsLoop();
+		}
+		$this->assertSame(10, $count01->getCount());
+		$this->assertSame(10, $count02->getCount());
+		$timeshare->pause($count01);
+		for($i=0;$i<10;$i++) {
+			$timeshare->__tsLoop();
+			$timeshare->__tsLoop();
+		}
+		$this->assertSame(10, $count01->getCount());
+		$this->assertSame(20, $count02->getCount());
+	}
 }

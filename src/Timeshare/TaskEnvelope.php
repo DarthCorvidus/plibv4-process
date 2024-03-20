@@ -6,6 +6,7 @@ class TaskEnvelope {
 	private TimeshareObservers $taskObservers;
 	private bool $started = false;
 	private ?int $terminatedAt = null;
+	private bool $paused = false;
 	function __construct(Timeshare $scheduler, Timeshared $task, TimeshareObservers $observers) {
 		$this->task = $task;
 		$this->taskObservers = $observers;
@@ -30,6 +31,9 @@ class TaskEnvelope {
 	}
 	
 	private function runLoop(): bool {
+		if($this->paused) {
+			return true;
+		}
 		try {
 			$result = $this->task->__tsLoop();
 			if($result == false) {
@@ -75,10 +79,12 @@ class TaskEnvelope {
 
 	public function pause(): void {
 		$this->task->__tsPause();
+		$this->paused = true;
 	}
 
 	public function resume(): void {
 		$this->task->__tsResume();
+		$this->paused = false;
 	}
 
 	public function terminate(): bool {

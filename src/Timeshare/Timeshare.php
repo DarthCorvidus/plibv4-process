@@ -175,4 +175,13 @@ class Timeshare implements Timeshared {
 	public function kill(Timeshared $timeshared): void {
 		$this->getTaskEnvelope($timeshared)->kill();
 	}
+	
+	public function pause(Timeshared $timeshared): void {
+		$this->getTaskEnvelope($timeshared)->pause();
+	}
+	
+	public function resume(Timeshared $timeshared): void {
+		$this->getTaskEnvelope($timeshared)->resume();
+	}
+
 }
