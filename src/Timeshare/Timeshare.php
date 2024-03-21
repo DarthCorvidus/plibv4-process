@@ -1,7 +1,7 @@
 <?php
 namespace plibv4\process;
 class Timeshare implements Timeshared {
-	private array $timeshared = array();
+	private Strategy $strategy;
 	private int $pointer = 0;
 	private int $count = 0;
 	private bool $terminated = false;
@@ -18,12 +18,10 @@ class Timeshare implements Timeshared {
 	const ERROR = 255;
 	function __construct() {
 		$this->timeshareObservers = new TimeshareObservers();
+		$this->strategy = new RoundRobin();
 	}
 	
 	function addTimeshareObserver(TimeshareObserver $observer): void {
-		#if(array_search($observer, $this->timeshareObservers)!==false) {
-		#	return;
-		#}
 		$this->timeshareObservers->addTimeshareObserver($observer);
 	}
 	
@@ -36,19 +34,15 @@ class Timeshare implements Timeshared {
 	}
 	
 	function getProcessCount(): int {
-		return $this->count;
+		return $this->strategy->getCount();
 	}
 	
 	function addTimeshared(Timeshared $timeshared): void {
-		$this->timeshared[] = new TaskEnvelope($this, $timeshared, $this->timeshareObservers);
-		$this->count++;
+		$this->strategy->add(new TaskEnvelope($this, $timeshared, $this->timeshareObservers));
 	}
 	
 	function __tsFinish(): void {
-		foreach($this->timeshared as $value) {
-			$value->finish();
-		}
-		$this->timeshared = array();
+		
 	}
 
 	public function __tsStart(): void {
@@ -65,54 +59,24 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	private function remove(Timeshared $timeshared, int $status): void {
-		$new = array();
-		$i = 0;
-		/*
-		 * We do not remove an item using array_search/unset, but by rebuilding
-		 * a new array, so the keys are contiguous again.
-		 * The performance penalty of this approach should be negligible.
-		 */
-		foreach($this->timeshared as $key => $value) {
-			if($value->getTimeshared()==$timeshared) {
-				$this->pointer = -1;
-				if($status === Timeshare::FINISH) {
-					$this->callFinish($value->getTimeshared());
-				}
-				continue;
-			}
-			$new[] = $value;
-			if($this->pointer<0) {
-				$this->pointer = $i;
-			}
-			$i++;
+	private function remove(TaskEnvelope $taskEnvelope, int $status): void {
+		$this->strategy->remove($taskEnvelope);
+		if($status === Timeshare::FINISH) {
+			$this->callFinish($taskEnvelope->getTimeshared());
 		}
-		if($this->pointer<0) {
-			$this->pointer = 0;
-		}
-		$this->timeshared = $new;
-		$this->count = count($this->timeshared);
-		$this->timeshareObservers->onRemove($this, $timeshared, $status);
+		$this->timeshareObservers->onRemove($this, $taskEnvelope->getTimeshared(), $status);
+	return;
 	}
 
 	private function callLoop(): void {
-		$task = $this->timeshared[$this->pointer];
-		/*
-		 * Increment the pointer only if __tsLoop evaluates to false, as the
-		 * task is removed otherwise within TaskEnvelope.
-		 */
-		if($task->loop()) {
-			$this->pointer++;
-			if($this->pointer==$this->count) {
-				$this->pointer = 0;
-			}
-		} else {
-			$this->remove($task->getTimeshared(), $task->getState());
+		$task = $this->strategy->getCurrentIncrement();
+		if(!$task->loop()) {
+			$this->remove($task, $task->getState());
 		}
 	}
 	
 	public function __tsLoop(): bool {
-		if(empty($this->timeshared)) {
+		if($this->strategy->getCount() === 0) {
 			return false;
 		}
 		$this->callLoop();
@@ -120,10 +84,9 @@ class Timeshare implements Timeshared {
 	}
 
 	public function __tsKill(): void {
-		foreach($this->timeshared as $value) {
-			$value->kill();
+		for($i = 0; $i < $this->strategy->getCount(); $i++) {
+			$this->strategy->getItem($i)->kill();
 		}
-		$this->timeshared = array();
 	}
 
 	public function __tsPause(): void {
@@ -135,8 +98,11 @@ class Timeshare implements Timeshared {
 	}
 
 	public function __tsTerminate(): bool {
-		foreach($this->timeshared as $value) {
-			$value->terminate();
+		if($this->strategy->getCount()===0) {
+			return true;
+		}
+		for($i = 0; $i < $this->strategy->getCount(); $i++) {
+			$this->strategy->getItem($i)->terminate();
 		}
 	return false;
 	}
@@ -153,8 +119,8 @@ class Timeshare implements Timeshared {
 	}
 	
 	public function hasTimeshared(Timeshared $timeshared): bool {
-		foreach($this->timeshared as $value) {
-			if($value->getTimeshared() === $timeshared) {
+		for($i = 0; $i < $this->strategy->getCount(); $i++) {
+			if($this->strategy->getItem($i)->getTimeshared() === $timeshared) {
 				return true;
 			}
 		}
@@ -162,9 +128,9 @@ class Timeshare implements Timeshared {
 	}
 	
 	private function getTaskEnvelope(Timeshared $timeshared): TaskEnvelope {
-		foreach($this->timeshared as $value) {
-			if($value->getTimeshared() === $timeshared) {
-				return $value;
+		for($i = 0; $i < $this->strategy->getCount(); $i++) {
+			if($this->strategy->getItem($i)->getTimeshared() === $timeshared) {
+				return $this->strategy->getItem($i);
 			}
 		}
 	throw new \RuntimeException("Task '". get_class($timeshared)."' not found in Scheduler '". get_class($this)."'");
