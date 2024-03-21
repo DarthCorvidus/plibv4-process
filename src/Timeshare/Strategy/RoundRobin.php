@@ -70,4 +70,8 @@ class RoundRobin implements Strategy {
 	public function isValid(): bool {
 		
 	}
+	
+	public function getItem(int $item): TaskEnvelope {
+		return $this->tasks[$item];
+	}
 }

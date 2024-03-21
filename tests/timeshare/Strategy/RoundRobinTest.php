@@ -249,4 +249,25 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame(0, TestHelper::getPropertyValue($rr, "pointer"));
 		$this->assertSame($count0, $rr->getCurrent());
 	}
+	
+	function testIterate() {
+		$rr = new RoundRobin();
+		$ts = new Timeshare();
+		$to = new TimeshareObservers();
+		$count0 = new TaskEnvelope($ts, new Counter(15), $to);
+		$count1 = new TaskEnvelope($ts, new Counter(20), $to);
+		$count2 = new TaskEnvelope($ts, new Counter(25), $to);
+		$count3 = new TaskEnvelope($ts, new Counter(30), $to);
+		$count4 = new TaskEnvelope($ts, new Counter(35), $to);
+		$rr->add($count0);
+		$rr->add($count1);
+		$rr->add($count2);
+		$rr->add($count3);
+		$rr->add($count4);
+		$this->assertSame($count0, $rr->getItem(0));
+		$this->assertSame($count1, $rr->getItem(1));
+		$this->assertSame($count2, $rr->getItem(2));
+		$this->assertSame($count3, $rr->getItem(3));
+		$this->assertSame($count4, $rr->getItem(4));
+	}
 }
