@@ -119,21 +119,16 @@ class Timeshare implements Timeshared {
 	}
 	
 	public function hasTimeshared(Timeshared $timeshared): bool {
-		for($i = 0; $i < $this->strategy->getCount(); $i++) {
-			if($this->strategy->getItem($i)->getTimeshared() === $timeshared) {
-				return true;
-			}
-		}
-	return false;
+		return $this->strategy->hasItemByTask($timeshared);
 	}
 	
 	private function getTaskEnvelope(Timeshared $timeshared): TaskEnvelope {
-		for($i = 0; $i < $this->strategy->getCount(); $i++) {
-			if($this->strategy->getItem($i)->getTimeshared() === $timeshared) {
-				return $this->strategy->getItem($i);
-			}
+		try {
+			$taskEnvelope = $this->strategy->getItemByTask($timeshared);
+			return $taskEnvelope;
+		} catch (\Exception $ex) {
+			throw new \RuntimeException("Task '". get_class($timeshared)."' not found in Scheduler '". get_class($this)."'");
 		}
-	throw new \RuntimeException("Task '". get_class($timeshared)."' not found in Scheduler '". get_class($this)."'");
 	}
 	
 	public function terminate(Timeshared $timeshared): void {
@@ -151,5 +146,4 @@ class Timeshare implements Timeshared {
 	public function resume(Timeshared $timeshared): void {
 		$this->getTaskEnvelope($timeshared)->resume();
 	}
-
 }

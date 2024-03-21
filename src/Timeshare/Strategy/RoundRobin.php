@@ -74,4 +74,22 @@ class RoundRobin implements Strategy {
 	public function getItem(int $item): TaskEnvelope {
 		return $this->tasks[$item];
 	}
+	
+	public function getItemByTask(Timeshared $timeshared): TaskEnvelope {
+		for($i = 0; $i < $this->getCount(); $i++) {
+			if($this->getItem($i)->getTimeshared() === $timeshared) {
+				return $this->getItem($i);
+			}
+		}
+	throw new \RuntimeException("Task '". get_class($timeshared)."' not found in '". get_class($this)."'");
+	}
+
+	public function hasItemByTask(Timeshared $timeshared): bool {
+		for($i = 0; $i < $this->getCount(); $i++) {
+			if($this->getItem($i)->getTimeshared() === $timeshared) {
+				return true;
+			}
+		}
+	return false;
+	}
 }
