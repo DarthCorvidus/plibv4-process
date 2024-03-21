@@ -2,11 +2,7 @@
 namespace plibv4\process;
 class Timeshare implements Timeshared {
 	private Strategy $strategy;
-	private int $pointer = 0;
-	private int $count = 0;
-	private bool $terminated = false;
 	private int $timeout = 30*1000000;
-	private int $terminatedAt = 0;
 	private TimeshareObservers $timeshareObservers;
 	const START = 1;
 	const LOOP = 2;
