@@ -64,18 +64,14 @@ class Timeshare implements Timeshared {
 	return;
 	}
 
-	private function callLoop(): void {
-		$task = $this->strategy->getCurrentIncrement();
-		if(!$task->loop()) {
-			$this->remove($task, $task->getState());
-		}
-	}
-	
 	public function __tsLoop(): bool {
 		if($this->strategy->getCount() === 0) {
 			return false;
 		}
-		$this->callLoop();
+		$task = $this->strategy->getCurrentIncrement();
+		if(!$task->loop()) {
+			$this->remove($task, $task->getState());
+		}
 	return true;
 	}
 
