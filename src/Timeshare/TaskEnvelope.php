@@ -7,11 +7,16 @@ class TaskEnvelope {
 	private bool $started = false;
 	private ?int $terminatedAt = null;
 	private bool $paused = false;
+	private ?int $state = null;
 	function __construct(Timeshare $scheduler, Timeshared $task, TimeshareObservers $observers) {
 		$this->task = $task;
 		$this->taskObservers = $observers;
 		$this->scheduler = $scheduler;
 		$this->taskObservers->onAdd($this->scheduler, $this->task);
+	}
+	
+	function getState(): int {
+		return $this->state;
 	}
 	
 	function getTimeshared(): Timeshared {
@@ -26,7 +31,8 @@ class TaskEnvelope {
 		} catch (\Exception $e) {
 			$this->task->__tsError($e, Timeshare::START);
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::START);
-			$this->scheduler->remove($this->task, Timeshare::ERROR);
+			$this->state = Timeshare::ERROR;
+			#$this->scheduler->remove($this->task, Timeshare::ERROR);
 		}
 	}
 	
@@ -37,13 +43,15 @@ class TaskEnvelope {
 		try {
 			$result = $this->task->__tsLoop();
 			if($result == false) {
-				$this->scheduler->remove($this->task, Timeshare::FINISH);
+				$this->state = Timeshare::FINISH;
+				#$this->scheduler->remove($this->task, Timeshare::FINISH);
 			}
 			return $result;
 		} catch (\Exception $e) {
 			$this->task->__tsError($e, Timeshare::LOOP);
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::LOOP);
-			$this->scheduler->remove($this->task, Timeshare::ERROR);
+			$this->state = Timeshare::ERROR;
+			#$this->scheduler->remove($this->task, Timeshare::ERROR);
 		return false;
 		}
 	}
@@ -51,17 +59,22 @@ class TaskEnvelope {
 	private function runTerminate(): bool {
 		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
 			$this->kill();
-			$this->scheduler->remove($this->task, Timeshare::KILL);
+			$this->state = Timeshare::KILL;
+			#$this->scheduler->remove($this->task, Timeshare::KILL);
 		return true;
 		}
 		if($this->task->__tsTerminate()) {
-			$this->scheduler->remove($this->task, Timeshare::TERMINATE);
+			$this->state = Timeshare::TERMINATE;
+			#this->scheduler->remove($this->task, Timeshare::TERMINATE);
 		return true;
 		}
 	return false;
 	}
 	
 	function loop(): bool {
+		if($this->state!==null) {
+			return false;
+		}
 		if($this->terminatedAt!==null && $this->runTerminate()) {
 			return false;
 		}
@@ -74,7 +87,8 @@ class TaskEnvelope {
 
 	public function kill(): void {
 		$this->task->__tsKill();
-		$this->scheduler->remove($this->task, Timeshare::KILL);
+		$this->state = Timeshare::KILL;
+		#$this->scheduler->remove($this->task, Timeshare::KILL);
 	}
 
 	public function pause(): void {

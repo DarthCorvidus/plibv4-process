@@ -65,7 +65,7 @@ class Timeshare implements Timeshared {
 		}
 	}
 	
-	public function remove(Timeshared $timeshared, int $status): void {
+	private function remove(Timeshared $timeshared, int $status): void {
 		$new = array();
 		$i = 0;
 		/*
@@ -106,6 +106,8 @@ class Timeshare implements Timeshared {
 			if($this->pointer==$this->count) {
 				$this->pointer = 0;
 			}
+		} else {
+			$this->remove($task->getTimeshared(), $task->getState());
 		}
 	}
 	
