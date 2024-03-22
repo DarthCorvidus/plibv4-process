@@ -7,11 +7,15 @@ class TrackObserver implements TimeshareObserver {
 	public int $countRemoved = 0;
 	public int $countError = 0;
 	public int $countStarted = 0;
+	public int $countPaused = 0;
+	public int $countResumed = 0;
 	public ?Timeshare $lastSchedule = null;
 	public ?Timeshared $lastTaskError = null;
 	public ?Timeshared $lastTaskAdded = null;
 	public ?Timeshared $lastTaskRemoved = null;
 	public ?Timeshared $lastTaskStarted = null;
+	public ?Timeshared $lastTaskPaused = null;
+	public ?Timeshared $lastTaskResumed = null;
 	public ?\Exception $lastException = null;
 	public int $lastStep = 0;
 	public function onAdd(Timeshare $timeshare, Timeshared $timeshared): void {
@@ -40,4 +44,17 @@ class TrackObserver implements TimeshareObserver {
 		$this->lastSchedule = $timeshare;
 		$this->lastTaskStarted = $timeshared;
 	}
+	
+	public function onPause(Timeshare $timeshare, Timeshared $timeshared): void {
+		$this->countPaused++;
+		$this->lastSchedule = $timeshare;
+		$this->lastTaskPaused = $timeshared;
+	}
+	
+	public function onResume(Timeshare $timeshare, Timeshared $timeshared): void {
+		$this->countResumed++;
+		$this->lastSchedule = $timeshare;
+		$this->lastTaskResumed = $timeshared;
+	}
+
 }
