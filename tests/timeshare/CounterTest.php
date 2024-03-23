@@ -95,4 +95,19 @@ class CounterTest extends TestCase {
 		$counter->__tsFinish();
 	}
 
+	function testExceptionPause() {
+		$counter = new Counter(250, 100);
+		$counter->exceptionPause = true;
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("exception at pause.");
+		$counter->__tsPause();
+	}
+	
+	function testExceptionResume() {
+		$counter = new Counter(250, 100);
+		$counter->exceptionResume = true;
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("exception at resume.");
+		$counter->__tsResume();
+	}
 }
