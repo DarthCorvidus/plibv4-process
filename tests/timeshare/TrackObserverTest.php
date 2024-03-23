@@ -22,7 +22,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskStarted);
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
-		$this->assertSame(null, $to->lastException);	
+		$this->assertSame(null, $to->lastException);
+		$to->onAddCalled($timeshare, $count01, 1);
 
 		$to->onAdd($timeshare, $count02);
 		$this->assertSame(2, $to->countAdded);
@@ -39,6 +40,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onAddCalled($timeshare, $count02, 2);
 	}
 	
 	function testOnRemove() {
