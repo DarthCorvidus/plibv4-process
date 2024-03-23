@@ -63,6 +63,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onRemoveCalled($timeshare, $count01, Timeshare::FINISH, 1);
+		$to->onAddNotCalled();
 		
 		$to->onRemove($timeshare, $count02, Timeshare::ERROR);
 		$this->assertSame(0, $to->countAdded);
@@ -79,6 +81,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onRemoveCalled($timeshare, $count02, Timeshare::ERROR, 2);
+		$to->onAddNotCalled();
 	}
 	
 	function testOnError() {
@@ -103,6 +107,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame($ex01, $to->lastException);
+		$to->onErrorCalled($timeshare, $count01, $ex01, Timeshare::FINISH, 1);
 		
 		$to->onError($timeshare, $count02, $ex02, Timeshare::START);
 		$this->assertSame(0, $to->countAdded);
@@ -119,6 +124,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame($ex02, $to->lastException);
+		$to->onErrorCalled($timeshare, $count02, $ex02, Timeshare::START, 2);
 	}
 	
 	function testOnStart() {
@@ -141,6 +147,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onStartCalled($timeshare, $count01, 1);
 		
 		$to->onStart($timeshare, $count02);
 		$this->assertSame(0, $to->countAdded);
@@ -157,6 +164,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onStartCalled($timeshare, $count02, 2);
 	}
 
 	function testOnPause() {
@@ -179,6 +187,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame($count01, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onPauseCalled($timeshare, $count01, 1);
 		
 		$to->onPause($timeshare, $count02);
 		$this->assertSame(0, $to->countAdded);
@@ -195,6 +204,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame($count02, $to->lastTaskPaused);
 		$this->assertSame(null, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onPauseCalled($timeshare, $count02, 2);
 	}
 
 	function testOnResume() {
@@ -217,6 +227,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame($count01, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onResumeCalled($timeshare, $count01, 1);
 		
 		$to->onResume($timeshare, $count02);
 		$this->assertSame(0, $to->countAdded);
@@ -233,6 +244,7 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(null, $to->lastTaskPaused);
 		$this->assertSame($count02, $to->lastTaskResumed);
 		$this->assertSame(null, $to->lastException);
+		$to->onResumeCalled($timeshare, $count02, 2);
 	}
 
 }

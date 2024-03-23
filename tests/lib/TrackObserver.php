@@ -36,35 +36,30 @@ class TrackObserver implements TimeshareObserver {
 	}
 
 	public function onAddCalled(Timeshare $timeshare, Timeshared $timeshared, int $count) {
-		TestCase::assertSame($this->countAdded, $count);
+		TestCase::assertSame($count, $this->countAdded);
 		TestCase::assertSame($timeshare, $this->lastSchedule);
 		TestCase::assertSame($timeshared, $this->lastTaskAdded);
 	}
 
-	public function onAddCalledOnly(Timeshare $timeshare, Timeshared $timeshared, int $count) {
-		TestCase::assertSame($timeshared, $this->lastSchedule);
-		TestCase::assertSame($count, $this->countAdded);
-		TestCase::assertSame(0, $this->countRemoved);
-		TestCase::assertSame(0, $this->countError);
-		TestCase::assertSame(0, $this->countStarted);
-		TestCase::assertSame(0, $this->countPaused);
-		TestCase::assertSame(0, $this->countResumed);
-		TestCase::assertSame(0, $this->lastStep);
-		TestCase::assertSame(null, $this->lastTaskError);
-		TestCase::assertSame(null, $this->lastTaskRemoved);
-		TestCase::assertSame($timeshare, $this->lastTaskAdded);
-		TestCase::assertSame(null, $this->lastTaskStarted);
-		TestCase::assertSame(null, $this->lastTaskPaused);
-		TestCase::assertSame(null, $this->lastTaskResumed);
-		TestCase::assertSame(null, $this->lastException);
+	public function onAddNotCalled() {
+		TestCase::assertSame(0, $this->countAdded);
+		TestCase::assertSame(null, $this->lastTaskAdded);
 	}
-	
+
 	public function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $e, int $step): void {
 		$this->countError++;
 		$this->lastSchedule = $timeshare;
 		$this->lastTaskError = $timeshared;
 		$this->lastException = $e;
 		$this->lastStep = $step;
+	}
+	
+	public function onErrorCalled(Timeshare $timeshare, Timeshared $timeshared, \Exception $e, int $step, int $count) {
+		TestCase::assertSame($count, $this->countError);
+		TestCase::assertSame($timeshare, $this->lastSchedule);
+		TestCase::assertSame($timeshared, $this->lastTaskError);
+		TestCase::assertSame($e, $this->lastException);
+		TestCase::assertSame($step, $this->lastStep);
 	}
 
 	public function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $step): void {
@@ -74,10 +69,23 @@ class TrackObserver implements TimeshareObserver {
 		$this->lastStep = $step;
 	}
 
+	public function onRemoveCalled(Timeshare $timeshare, Timeshared $timeshared, int $step, int $count): void {
+		TestCase::assertSame($count, $this->countRemoved);
+		TestCase::assertSame($timeshare, $this->lastSchedule);
+		TestCase::assertSame($timeshared, $this->lastTaskRemoved);
+		TestCase::assertSame($step, $this->lastStep);
+	}
+
 	public function onStart(Timeshare $timeshare, Timeshared $timeshared): void {
 		$this->countStarted++;
 		$this->lastSchedule = $timeshare;
 		$this->lastTaskStarted = $timeshared;
+	}
+	
+	public function onStartCalled(Timeshare $timeshare, Timeshared $timeshared, int $count) {
+		TestCase::assertSame($count, $this->countStarted);
+		TestCase::assertSame($timeshare, $this->lastSchedule);
+		TestCase::assertSame($timeshared, $this->lastTaskStarted);
 	}
 	
 	public function onPause(Timeshare $timeshare, Timeshared $timeshared): void {
@@ -85,11 +93,23 @@ class TrackObserver implements TimeshareObserver {
 		$this->lastSchedule = $timeshare;
 		$this->lastTaskPaused = $timeshared;
 	}
+
+	public function onPauseCalled(Timeshare $timeshare, Timeshared $timeshared, int $count) {
+		TestCase::assertSame($count, $this->countPaused);
+		TestCase::assertSame($timeshare, $this->lastSchedule);
+		TestCase::assertSame($timeshared, $this->lastTaskPaused);
+	}
 	
 	public function onResume(Timeshare $timeshare, Timeshared $timeshared): void {
 		$this->countResumed++;
 		$this->lastSchedule = $timeshare;
 		$this->lastTaskResumed = $timeshared;
+	}
+
+	public function onResumeCalled(Timeshare $timeshare, Timeshared $timeshared, int $count) {
+		TestCase::assertSame($count, $this->countResumed);
+		TestCase::assertSame($timeshare, $this->lastSchedule);
+		TestCase::assertSame($timeshared, $this->lastTaskResumed);
 	}
 	
 }
