@@ -5,4 +5,6 @@ interface TimeshareObserver {
 	function onStart(Timeshare $timeshare, Timeshared $timeshared): void;
 	function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $step): void;
 	function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $e, int $step): void;
+	function onPause(Timeshare $timeshare, Timeshared $timeshared): void;
+	function onResume(Timeshare $timeshare, Timeshared $timeshared): void;
 }
