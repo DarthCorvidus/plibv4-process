@@ -19,6 +19,19 @@ class TimeshareObservers {
 			$value->onStart($timeshare, $timeshared);
 		}
 	}
+	
+	function onPause(Timeshare $timeshare, Timeshared $timeshared): void {
+		foreach($this->timeshareObservers as $value) {
+			$value->onPause($timeshare, $timeshared);
+		}
+	}
+
+	function onResume(Timeshare $timeshare, Timeshared $timeshared): void {
+		foreach($this->timeshareObservers as $value) {
+			$value->onResume($timeshare, $timeshared);
+		}
+	}
+
 	function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $step): void {
 		foreach($this->timeshareObservers as $value) {
 			$value->onRemove($timeshare, $timeshared, $step);

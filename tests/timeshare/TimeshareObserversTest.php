@@ -5,10 +5,10 @@ use \plibv4\process\Timeshare;
 use \plibv4\process\Timeshared;
 use \plibv4\process\TimeshareObserver;
 use \plibv4\process\TimeshareObservers;
-class TimeshareObserversTest extends TestCase implements TimeshareObserver {
+class TimeshareObserversTest extends TestCase {
 	public function testAddObserver() {
 		$timeshare = new TimeshareObservers();
-		$timeshare->addTimeshareObserver($this);
+		$timeshare->addTimeshareObserver(new TrackObserver());
 		
 		$reflection = new ReflectionClass($timeshare);
 		$name = $reflection->getProperty("timeshareObservers");
@@ -18,8 +18,9 @@ class TimeshareObserversTest extends TestCase implements TimeshareObserver {
 
 	public function testAddDuplicate() {
 		$timeshare = new TimeshareObservers();
-		$timeshare->addTimeshareObserver($this);
-		$timeshare->addTimeshareObserver($this);
+		$to = new TrackObserver();
+		$timeshare->addTimeshareObserver($to);
+		$timeshare->addTimeshareObserver($to);
 	
 		$reflection = new ReflectionClass($timeshare);
 		$name = $reflection->getProperty("timeshareObservers");
@@ -27,16 +28,77 @@ class TimeshareObserversTest extends TestCase implements TimeshareObserver {
 		$this->assertSame(1, count($name->getValue($timeshare)));
 	}
 	
-	public function onAdd(Timeshare $timeshare, Timeshared $timeshared): void {
-	}
+	function testOnAdd() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
 
-	public function onStart(Timeshare $timeshare, Timeshared $timeshared): void {
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		
+		$obs->onAdd($timeshare, $count);
+		$to->onAddCalled($timeshare, $count, 1);
 	}
 	
-	public function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $exception, int $step): void {
+	function testOnStart() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
+
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		
+		$obs->onStart($timeshare, $count);
+		$to->onStartCalled($timeshare, $count, 1);
 	}
 
-	public function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $status): void {
+	function testOnRemove() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
+
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		
+		$obs->onRemove($timeshare, $count, Timeshare::FINISH);
+		$to->onRemoveCalled($timeshare, $count, Timeshare::FINISH, 1);
+	}
+
+	function testOnPause() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
+
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		
+		$obs->onPause($timeshare, $count);
+		$to->onPauseCalled($timeshare, $count, 1);
+	}
+
+	function testOnResume() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
+
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		
+		$obs->onResume($timeshare, $count);
+		$to->onResumeCalled($timeshare, $count, 1);
+	}
+
+	function testOnError() {
+		$timeshare = new Timeshare();
+		$to = new TrackObserver();
+
+		$obs = new TimeshareObservers();
+		$obs->addTimeshareObserver($to);
+		$count = new Counter(15);
+		$ex = new \Exception("test");
+		
+		$obs->onError($timeshare, $count, $ex, Timeshare::FINISH);
+		$to->onErrorCalled($timeshare, $count, $ex, Timeshare::FINISH, 1);
 	}
 
 }
