@@ -15,7 +15,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(0, $to->lastStep);
+		$this->assertSame(0, $to->lastStepRemoved);
+		$this->assertSame(0, $to->lastStepError);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame($count01, $to->lastTaskAdded);
@@ -32,7 +33,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(0, $to->lastStep);
+		$this->assertSame(0, $to->lastStepRemoved);
+		$this->assertSame(0, $to->lastStepError);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame($count02, $to->lastTaskAdded);
@@ -55,7 +57,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(Timeshare::FINISH, $to->lastStep);
+		$this->assertSame(Timeshare::FINISH, $to->lastStepRemoved);
+		$this->assertSame(0, $to->lastStepError);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame($count01, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -73,7 +76,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(Timeshare::ERROR, $to->lastStep);
+		$this->assertSame(Timeshare::ERROR, $to->lastStepRemoved);
+		$this->assertSame(0, $to->lastStepError);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame($count02, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -99,7 +103,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(Timeshare::FINISH, $to->lastStep);
+		$this->assertSame(Timeshare::FINISH, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame($count01, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -116,7 +121,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
-		$this->assertSame(Timeshare::START, $to->lastStep);
+		$this->assertSame(Timeshare::START, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame($count02, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -139,7 +145,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(1, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -156,7 +163,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(2, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -179,7 +187,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(1, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -196,7 +205,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(2, $to->countPaused);
 		$this->assertSame(0, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -219,7 +229,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(1, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
@@ -236,7 +247,8 @@ class TrackObserverTest extends TestCase {
 		$this->assertSame(0, $to->countStarted);
 		$this->assertSame(0, $to->countPaused);
 		$this->assertSame(2, $to->countResumed);
- 		$this->assertSame(0, $to->lastStep);
+ 		$this->assertSame(0, $to->lastStepError);
+		$this->assertSame(0, $to->lastStepRemoved);
 		$this->assertSame(null, $to->lastTaskError);
 		$this->assertSame(null, $to->lastTaskRemoved);
 		$this->assertSame(null, $to->lastTaskAdded);
