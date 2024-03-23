@@ -92,13 +92,27 @@ class TaskEnvelope {
 	}
 
 	public function pause(): void {
-		$this->task->__tsPause();
-		$this->paused = true;
+		try {
+			$this->task->__tsPause();
+			$this->taskObservers->onPause($this->scheduler, $this->task);
+			$this->paused = true;
+		} catch (\Exception $e) {
+			$this->task->__tsError($e, Timeshare::PAUSE);
+			$this->state = Timeshare::PAUSE;
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::PAUSE);
+		}
 	}
 
 	public function resume(): void {
-		$this->task->__tsResume();
-		$this->paused = false;
+		try {
+			$this->task->__tsResume();
+			$this->taskObservers->onResume($this->scheduler, $this->task);
+			$this->paused = false;
+		} catch (\Exception $e) {
+			$this->task->__tsError($e, Timeshare::RESUME);
+			$this->state = Timeshare::RESUME;
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::RESUME);
+		}
 	}
 
 	public function terminate(): bool {

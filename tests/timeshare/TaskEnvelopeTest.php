@@ -6,52 +6,40 @@ use plibv4\process\TimeshareObserver;
 use plibv4\process\TaskEnvelope;
 use plibv4\process\Timeshare;
 use plibv4\process\Timeshared;
-class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
-	private int $started = 0;
-	private int $errors = 0;
-	private int $lastStep = 0;
-	private ?\Exception $lastException = null;
-	function tearDown() {
-		parent::tearDown();
-		$this->started = 0;
-		$this->errors = 0;
-	}
+class TaskEnvelopeTest extends TestCase {
 	function testConstruct() {
 		$observers = new TimeshareObservers();
-		$observers->addTimeshareObserver($this);
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
 		$this->assertInstanceOf(TaskEnvelope::class, $envelope);
-		$this->assertSame(0, $this->started);
+		$to->onStartNotCalled();
 	}
 	
 	function testStart() {
 		$observers = new TimeshareObservers();
-		$observers->addTimeshareObserver($this);
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
 		$envelope->loop();
-		$this->assertSame(1, $task->started);
-		$this->assertSame(1, $this->started);
+		$to->onStartCalled($scheduler, $task, 1);
 		$this->assertSame(0, $task->getCount());
 	}
 
 	function testStartError() {
 		$observers = new TimeshareObservers();
-		$observers->addTimeshareObserver($this);
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$task->exceptionStart = true;
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
 		$envelope->loop();
-		$this->assertSame(0, $task->started);
-		$this->assertSame(0, $this->started);
-		$this->assertSame(1, $this->errors);
-		$this->assertSame(Timeshare::START, $this->lastStep);
-		$this->assertInstanceOf(\RuntimeException::class, $this->lastException);
-		$this->assertSame("exception at start", $this->lastException->getMessage());
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::START, 1);
 		$this->assertSame(0, $task->getCount());
 	}
 	
@@ -85,7 +73,8 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 
 	function testLoopError() {
 		$observers = new TimeshareObservers();
-		$observers->addTimeshareObserver($this);
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
 		$task->exceptionOn(15);
@@ -93,30 +82,77 @@ class TaskEnvelopeTest extends TestCase implements TimeshareObserver {
 		while($envelope->loop()) {
 			
 		}
-		$this->assertSame(1, $task->started);
-		$this->assertSame(1, $this->started);
-		$this->assertSame(1, $this->errors);
-		$this->assertSame(Timeshare::LOOP, $this->lastStep);
-		$this->assertInstanceOf(\RuntimeException::class, $this->lastException);
-		$this->assertSame("This exception is an expection.", $this->lastException->getMessage());
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::LOOP, 1);
+		$this->assertSame("This exception is an expection.", $task->exceptionReceived->getMessage());
 		$this->assertSame(15, $task->getCount());
 	}
-
-	public function onAdd(Timeshare $timeshare, Timeshared $timeshared): void {
-		
+	
+	function testPause() {
+		$observers = new TimeshareObservers();
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
+		$scheduler = new Timeshare();
+		$task = new Counter(20);
+		$envelope = new TaskEnvelope($scheduler, $task, $observers);
+		for($i = 0; $i<=10;$i++) {
+			$envelope->loop();
+		}
+		$envelope->pause();
+		$to->onPauseCalled($scheduler, $task, 1);
+		$this->assertSame(10, $task->getCount());
+		for($i = 0; $i<=10;$i++) {
+			$envelope->loop();
+		}
+		$this->assertSame(10, $task->getCount());
+	}
+	
+	function testPauseError() {
+		$observers = new TimeshareObservers();
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
+		$scheduler = new Timeshare();
+		$task = new Counter(20);
+		$task->exceptionPause = true;
+		$envelope = new TaskEnvelope($scheduler, $task, $observers);
+		for($i = 0; $i<=10;$i++) {
+			$envelope->loop();
+		}
+		$envelope->pause();
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::PAUSE, 1);
 	}
 
-	public function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $e, int $step): void {
-		$this->errors++;
-		$this->lastStep = $step;
-		$this->lastException = $e;
+	function testResume() {
+		$observers = new TimeshareObservers();
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
+		$scheduler = new Timeshare();
+		$task = new Counter(20);
+		$envelope = new TaskEnvelope($scheduler, $task, $observers);
+		for($i = 0; $i<=10;$i++) {
+			$envelope->loop();
+		}
+		$envelope->pause();
+		$to->onPauseCalled($scheduler, $task, 1);
+		$envelope->resume();
+		$to->onResumeCalled($scheduler, $task, 1);
+		$this->assertSame(10, $task->getCount());
+		while($envelope->loop()) {}
+		$this->assertSame(20, $task->getCount());
 	}
-
-	public function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $step): void {
-		
-	}
-
-	public function onStart(Timeshare $timeshare, Timeshared $timeshared): void {
-		$this->started++;
+	
+	function testResumeError() {
+		$observers = new TimeshareObservers();
+		$to = new TrackObserver();
+		$observers->addTimeshareObserver($to);
+		$scheduler = new Timeshare();
+		$task = new Counter(20);
+		$task->exceptionResume = true;
+		$envelope = new TaskEnvelope($scheduler, $task, $observers);
+		for($i = 0; $i<=10;$i++) {
+			$envelope->loop();
+		}
+		$envelope->pause();
+		$envelope->resume();
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::RESUME, 1);
 	}
 }
