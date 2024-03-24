@@ -10,7 +10,7 @@ class TimeshareTest extends TestCase {
 	
 	function testGetCountZero() {
 		$timeshare = new plibv4\process\Timeshare();
-		$this->assertSame(0, $timeshare->getProcessCount());
+		$this->assertSame(0, $timeshare->getTaskCount());
 	}
 	
 	function testGetTimeoutSeconds() {
@@ -31,11 +31,11 @@ class TimeshareTest extends TestCase {
 		$this->assertSame(20000150, $timeshare->getTimeout());
 	}
 	
-	function testGetProcessCountAdded() {
+	function testGetCountAdded() {
 		$timeshare = new plibv4\process\Timeshare();
 		$count = new Counter(500);
 		$timeshare->addTask($count);
-		$this->assertSame(1, $timeshare->getProcessCount());
+		$this->assertSame(1, $timeshare->getTaskCount());
 		$this->assertSame(0, $count->started);
 		$this->assertSame(0, $count->finished);
 		$this->assertSame(0, $count->terminated);
@@ -48,7 +48,7 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
 		$timeshare->__tsLoop();
-		$this->assertSame(2, $timeshare->getProcessCount());
+		$this->assertSame(2, $timeshare->getTaskCount());
 		$this->assertSame(1, $count01->started);
 		$this->assertSame(0, $count01->finished);
 		$this->assertSame(0, $count01->terminated);

@@ -1,6 +1,6 @@
 <?php
 namespace plibv4\process;
-class Timeshare implements Task {
+class Timeshare implements Task, Scheduler {
 	private Strategy $strategy;
 	private int $timeout = 30*1000000;
 	private TimeshareObservers $timeshareObservers;
@@ -21,7 +21,7 @@ class Timeshare implements Task {
 		$this->timeshareObservers->addTimeshareObserver($observer);
 	}
 	
-	function setTimeout(int $seconds, int $microseconds) {
+	function setTimeout(int $seconds, int $microseconds): void {
 		$this->timeout = $seconds*1000000 + $microseconds;
 	}
 	
@@ -29,7 +29,7 @@ class Timeshare implements Task {
 		return $this->timeout;
 	}
 	
-	function getProcessCount(): int {
+	function getTaskCount(): int {
 		return $this->strategy->getCount();
 	}
 	
