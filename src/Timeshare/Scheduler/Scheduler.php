@@ -68,4 +68,9 @@ interface Scheduler {
 	 * @return void
 	 */
 	public function resume(Task $task): void;
+	/**
+	 * Run the Scheduler until it is out of Tasks to process.
+	 * @return void
+	 */
+	public function run(): void;
 }
