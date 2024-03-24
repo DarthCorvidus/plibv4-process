@@ -11,10 +11,13 @@ class Main implements TimeshareObserver, InputObserver {
 	function __construct() {
 		$this->scheduler = new Timeshare();
 		$this->scheduler->addTimeshareObserver($this);
-		echo "Task livecycle demonstration. Please enter a number from 1 - 10.".PHP_EOL;
-		echo "A Number higher than 10 will throw an exception once 10 is surpassed.".PHP_EOL;
+		echo "Task lifecycle demonstration. Please enter a number from 1 - 10.".PHP_EOL;
+		echo "A number higher than 10 will throw an exception once 10 is surpassed.".PHP_EOL;
 		echo "x: quit, p: pause/resume.".PHP_EOL;
 		echo "> ";
+		/*
+		 * We quit if casting to int results in zero.
+		 */
 		$number = (int)fgets(STDIN);
 		if($number <= 0) {
 			return;
@@ -26,6 +29,9 @@ class Main implements TimeshareObserver, InputObserver {
 	}
 	
 	function run() {
+		/**
+		 * Run the scheduler until no more tasks are left.
+		 */
 		$this->scheduler->run();
 	}
 
@@ -43,6 +49,9 @@ class Main implements TimeshareObserver, InputObserver {
 
 	public function onRemove(Scheduler $scheduler, \plibv4\process\Task $task, int $step): void {
 		echo "TimeshareObserver::onRemove() called, ". get_class($task)." step ".$step.".".PHP_EOL;
+		/**
+		 * If task Deca was removed from the scheduler, terminate Input as well.
+		 */
 		if($task === $this->deca) {
 			$this->scheduler->terminate($this->input);
 		}
@@ -55,13 +64,24 @@ class Main implements TimeshareObserver, InputObserver {
 	public function onStart(Scheduler $scheduler, \plibv4\process\Task $task): void {
 		echo "TimeshareObserver::onStart(), ".get_class($task)." called.".PHP_EOL;
 	}
-
+	/**
+	 * Handle input.
+	 * @param Input $input
+	 * @param string $c
+	 * @return type
+	 */
 	public function onInput(Input $input, string $c) {
+		/**
+		 * Terminate both tasks on 'x'.
+		 */
 		if($c=="x") {
 			$this->scheduler->terminate($input);
 			$this->scheduler->terminate($this->deca);
 		return;
 		}
+		/**
+		 * pause or unpause Deca on 'p'
+		 */
 		if($c=="p" && !$this->paused) {
 			$this->scheduler->pause($this->deca);
 			$this->paused = true;
