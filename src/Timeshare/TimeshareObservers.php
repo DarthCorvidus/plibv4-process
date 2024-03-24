@@ -9,38 +9,38 @@ class TimeshareObservers {
 		$this->timeshareObservers[] = $observer;
 	}
 
-	function onAdd(Timeshare $timeshare, Task $Task): void {
+	function onAdd(Timeshare $timeshare, Task $task): void {
 		foreach($this->timeshareObservers as $value) {
-			$value->onAdd($timeshare, $Task);
+			$value->onAdd($timeshare, $task);
 		}
 	}
-	function onStart(Timeshare $timeshare, Task $Task): void {
+	function onStart(Timeshare $timeshare, Task $task): void {
 		foreach($this->timeshareObservers as $value) {
-			$value->onStart($timeshare, $Task);
-		}
-	}
-	
-	function onPause(Timeshare $timeshare, Task $Task): void {
-		foreach($this->timeshareObservers as $value) {
-			$value->onPause($timeshare, $Task);
-		}
-	}
-
-	function onResume(Timeshare $timeshare, Task $Task): void {
-		foreach($this->timeshareObservers as $value) {
-			$value->onResume($timeshare, $Task);
-		}
-	}
-
-	function onRemove(Timeshare $timeshare, Task $Task, int $step): void {
-		foreach($this->timeshareObservers as $value) {
-			$value->onRemove($timeshare, $Task, $step);
+			$value->onStart($timeshare, $task);
 		}
 	}
 	
-	function onError(Timeshare $timeshare, Task $Task, \Exception $e, int $step): void {
+	function onPause(Timeshare $timeshare, Task $task): void {
 		foreach($this->timeshareObservers as $value) {
-			$value->onError($timeshare, $Task, $e, $step);
+			$value->onPause($timeshare, $task);
+		}
+	}
+
+	function onResume(Timeshare $timeshare, Task $task): void {
+		foreach($this->timeshareObservers as $value) {
+			$value->onResume($timeshare, $task);
+		}
+	}
+
+	function onRemove(Timeshare $timeshare, Task $task, int $step): void {
+		foreach($this->timeshareObservers as $value) {
+			$value->onRemove($timeshare, $task, $step);
+		}
+	}
+	
+	function onError(Timeshare $timeshare, Task $task, \Exception $e, int $step): void {
+		foreach($this->timeshareObservers as $value) {
+			$value->onError($timeshare, $task, $e, $step);
 		}
 	}
 }

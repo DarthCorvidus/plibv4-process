@@ -33,8 +33,8 @@ class Timeshare implements Task, Scheduler {
 		return $this->strategy->getCount();
 	}
 	
-	function addTask(Task $Task): void {
-		$this->strategy->add(new TaskEnvelope($this, $Task, $this->timeshareObservers));
+	function addTask(Task $task): void {
+		$this->strategy->add(new TaskEnvelope($this, $task, $this->timeshareObservers));
 	}
 	
 	function __tsFinish(): void {
@@ -45,12 +45,12 @@ class Timeshare implements Task, Scheduler {
 		
 	}
 	
-	private function callFinish(Task $Task): void {
+	private function callFinish(Task $task): void {
 		try {
-			$Task->__tsFinish();
+			$task->__tsFinish();
 		} catch (\Exception $e) {
-			$this->timeshareObservers->onError($this, $Task, $e, Timeshare::FINISH);
-			$Task->__tsError($e, Timeshare::FINISH);
+			$this->timeshareObservers->onError($this, $task, $e, Timeshare::FINISH);
+			$task->__tsError($e, Timeshare::FINISH);
 		return;
 		}
 	}
@@ -110,32 +110,32 @@ class Timeshare implements Task, Scheduler {
 		throw $e;
 	}
 	
-	public function hasTask(Task $Task): bool {
-		return $this->strategy->hasItemByTask($Task);
+	public function hasTask(Task $task): bool {
+		return $this->strategy->hasItemByTask($task);
 	}
 	
-	private function getTaskEnvelope(Task $Task): TaskEnvelope {
+	private function getTaskEnvelope(Task $task): TaskEnvelope {
 		try {
-			$taskEnvelope = $this->strategy->getItemByTask($Task);
+			$taskEnvelope = $this->strategy->getItemByTask($task);
 			return $taskEnvelope;
 		} catch (\Exception $ex) {
-			throw new \RuntimeException("Task '". get_class($Task)."' not found in Scheduler '". get_class($this)."'");
+			throw new \RuntimeException("Task '". get_class($task)."' not found in Scheduler '". get_class($this)."'");
 		}
 	}
 	
-	public function terminate(Task $Task): void {
-		$this->getTaskEnvelope($Task)->terminate();
+	public function terminate(Task $task): void {
+		$this->getTaskEnvelope($task)->terminate();
 	}
 	
-	public function kill(Task $Task): void {
-		$this->getTaskEnvelope($Task)->kill();
+	public function kill(Task $task): void {
+		$this->getTaskEnvelope($task)->kill();
 	}
 	
-	public function pause(Task $Task): void {
-		$this->getTaskEnvelope($Task)->pause();
+	public function pause(Task $task): void {
+		$this->getTaskEnvelope($task)->pause();
 	}
 	
-	public function resume(Task $Task): void {
-		$this->getTaskEnvelope($Task)->resume();
+	public function resume(Task $task): void {
+		$this->getTaskEnvelope($task)->resume();
 	}
 }

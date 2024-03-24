@@ -6,8 +6,8 @@ interface Strategy {
 	function getCurrent(): TaskEnvelope;
 	function getCurrentIncrement(): TaskEnvelope;
 	function increment(): void;
-	function add(TaskEnvelope $Task);
-	function remove(TaskEnvelope $Task);
-	function getItemByTask(Task $Task): TaskEnvelope;
-	function hasItemByTask(Task $Task): bool;
+	function add(TaskEnvelope $task);
+	function remove(TaskEnvelope $task);
+	function getItemByTask(Task $task): TaskEnvelope;
+	function hasItemByTask(Task $task): bool;
 }

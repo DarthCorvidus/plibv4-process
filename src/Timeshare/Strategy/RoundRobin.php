@@ -12,8 +12,8 @@ class RoundRobin implements Strategy {
 		return $this->count;
 	}
 	
-	public function add(TaskEnvelope $Task) {
-		$this->tasks[$this->count] = $Task;
+	public function add(TaskEnvelope $task) {
+		$this->tasks[$this->count] = $task;
 		if($this->count == 0) {
 			$this->pointer = 0;
 		}
@@ -51,10 +51,10 @@ class RoundRobin implements Strategy {
 		}
 	}
 	
-	public function remove(TaskEnvelope $Task) {
+	public function remove(TaskEnvelope $task) {
 		$new = array();
 		foreach($this->tasks as $key => $value) {
-			if($value === $Task) {
+			if($value === $task) {
 				$this->modifyPointer($key);
 				$this->count--;
 				continue;
@@ -75,18 +75,18 @@ class RoundRobin implements Strategy {
 		return $this->tasks[$item];
 	}
 	
-	public function getItemByTask(Task $Task): TaskEnvelope {
+	public function getItemByTask(Task $task): TaskEnvelope {
 		for($i = 0; $i < $this->getCount(); $i++) {
-			if($this->getItem($i)->getTask() === $Task) {
+			if($this->getItem($i)->getTask() === $task) {
 				return $this->getItem($i);
 			}
 		}
-	throw new \RuntimeException("Task '". get_class($Task)."' not found in '". get_class($this)."'");
+	throw new \RuntimeException("Task '". get_class($task)."' not found in '". get_class($this)."'");
 	}
 
-	public function hasItemByTask(Task $Task): bool {
+	public function hasItemByTask(Task $task): bool {
 		for($i = 0; $i < $this->getCount(); $i++) {
-			if($this->getItem($i)->getTask() === $Task) {
+			if($this->getItem($i)->getTask() === $task) {
 				return true;
 			}
 		}
