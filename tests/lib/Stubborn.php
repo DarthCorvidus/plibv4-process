@@ -1,5 +1,5 @@
 <?php
-class Stubborn implements \plibv4\process\Timeshared {
+class Stubborn implements \plibv4\process\Task {
 	public function __tsFinish(): void {
 		
 	}

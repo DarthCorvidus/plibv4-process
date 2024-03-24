@@ -6,8 +6,8 @@ interface Strategy {
 	function getCurrent(): TaskEnvelope;
 	function getCurrentIncrement(): TaskEnvelope;
 	function increment(): void;
-	function add(TaskEnvelope $timeshared);
-	function remove(TaskEnvelope $timeshared);
-	function getItemByTask(Timeshared $timeshared): TaskEnvelope;
-	function hasItemByTask(Timeshared $timeshared): bool;
+	function add(TaskEnvelope $Task);
+	function remove(TaskEnvelope $Task);
+	function getItemByTask(Task $Task): TaskEnvelope;
+	function hasItemByTask(Task $Task): bool;
 }

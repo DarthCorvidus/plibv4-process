@@ -1,14 +1,14 @@
 <?php
 namespace plibv4\process;
 class TaskEnvelope {
-	private Timeshared $task;
+	private Task $task;
 	private Timeshare $scheduler;
 	private TimeshareObservers $taskObservers;
 	private bool $started = false;
 	private ?int $terminatedAt = null;
 	private bool $paused = false;
 	private ?int $state = null;
-	function __construct(Timeshare $scheduler, Timeshared $task, TimeshareObservers $observers) {
+	function __construct(Timeshare $scheduler, Task $task, TimeshareObservers $observers) {
 		$this->task = $task;
 		$this->taskObservers = $observers;
 		$this->scheduler = $scheduler;
@@ -19,7 +19,7 @@ class TaskEnvelope {
 		return $this->state;
 	}
 	
-	function getTimeshared(): Timeshared {
+	function getTask(): Task {
 		return $this->task;
 	}
 	

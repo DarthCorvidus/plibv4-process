@@ -2,7 +2,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use \plibv4\process\Timeshare;
-use \plibv4\process\Timeshared;
+use \plibv4\process\Task;
 use \plibv4\process\TimeshareObserver;
 class TimeshareObserverTest extends TestCase {
 	private int $addCount = 0;
@@ -11,10 +11,10 @@ class TimeshareObserverTest extends TestCase {
 	private int $startCount = 0;
 	private int $errorCount = 0;
 	private int $lastErrorStatus = 0;
-	private ?Timeshared $lastAdded = null;
-	private ?Timeshared $lastRemoved = null;
-	private ?Timeshared $lastStarted = null;
-	private ?Timeshared $lastError = null;
+	private ?Task $lastAdded = null;
+	private ?Task $lastRemoved = null;
+	private ?Task $lastStarted = null;
+	private ?Task $lastError = null;
 	private ?\Exception $lastException = null;
 
 	public function testOnAdd() {
@@ -24,10 +24,10 @@ class TimeshareObserverTest extends TestCase {
 		$count01 = new Counter(15);
 		$count02 = new Counter(20);
 		
-		$timeshare->addTimeshared($count01);
+		$timeshare->addTask($count01);
 		$to->onAddCalled($timeshare, $count01, 1);
 		
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count02);
 		$to->onAddCalled($timeshare, $count02, 2);
 	}
 
@@ -38,8 +38,8 @@ class TimeshareObserverTest extends TestCase {
 		$count01 = new Counter(15);
 		$count02 = new Counter(20);
 		$count03 = new Counter(10);
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 
 		$timeshare->__tsLoop();
 		$to->onStartCalled($timeshare, $count01, 1);
@@ -48,7 +48,7 @@ class TimeshareObserverTest extends TestCase {
 		$to->onStartCalled($timeshare, $count02, 2);
 		$timeshare->run();
 
-		$timeshare->addTimeshared($count03);
+		$timeshare->addTask($count03);
 		$timeshare->run();
 		$to->onStartCalled($timeshare, $count03, 3);
 	}
@@ -61,8 +61,8 @@ class TimeshareObserverTest extends TestCase {
 		$count01 = new Counter(15);
 		$count02 = new Counter(20);
 		
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 		$timeshare->run();
 		
 		$to->onRemoveCalled($timeshare, $count02, Timeshare::FINISH, 2);
@@ -75,8 +75,8 @@ class TimeshareObserverTest extends TestCase {
 		$count01 = new Counter(15);
 		$count02 = new Counter(20);
 		
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 		$i = 0;
 		while($timeshare->__tsLoop()) {
 			if($i == 10) {
@@ -96,8 +96,8 @@ class TimeshareObserverTest extends TestCase {
 		$count02 = new Counter(20);
 		$count02->exceptionStart = true;
 		
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 		$timeshare->__tsLoop();
 		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Timeshare::START, 1);
 		$this->assertSame(0, $count01->getCount());
@@ -115,8 +115,8 @@ class TimeshareObserverTest extends TestCase {
 		$count01->exceptionOn(10);
 		$count02 = new Counter(20);
 		$count02->exceptionOn(13);
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 		// 11 iterations to trigger the first error
 		for($i = 0; $i <= 10;$i++) {
 			$timeshare->__tsLoop();
@@ -140,8 +140,8 @@ class TimeshareObserverTest extends TestCase {
 		$count01->exceptionFinish = true;
 		$count02 = new Counter(20);
 		$count02->exceptionFinish = true;
-		$timeshare->addTimeshared($count01);
-		$timeshare->addTimeshared($count02);
+		$timeshare->addTask($count01);
+		$timeshare->addTask($count02);
 		// 11 iterations to trigger the first error
 		for($i = 0; $i <= 15;$i++) {
 			$timeshare->__tsLoop();

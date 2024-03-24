@@ -12,8 +12,8 @@ class RoundRobin implements Strategy {
 		return $this->count;
 	}
 	
-	public function add(TaskEnvelope $timeshared) {
-		$this->tasks[$this->count] = $timeshared;
+	public function add(TaskEnvelope $Task) {
+		$this->tasks[$this->count] = $Task;
 		if($this->count == 0) {
 			$this->pointer = 0;
 		}
@@ -51,10 +51,10 @@ class RoundRobin implements Strategy {
 		}
 	}
 	
-	public function remove(TaskEnvelope $timeshared) {
+	public function remove(TaskEnvelope $Task) {
 		$new = array();
 		foreach($this->tasks as $key => $value) {
-			if($value === $timeshared) {
+			if($value === $Task) {
 				$this->modifyPointer($key);
 				$this->count--;
 				continue;
@@ -75,18 +75,18 @@ class RoundRobin implements Strategy {
 		return $this->tasks[$item];
 	}
 	
-	public function getItemByTask(Timeshared $timeshared): TaskEnvelope {
+	public function getItemByTask(Task $Task): TaskEnvelope {
 		for($i = 0; $i < $this->getCount(); $i++) {
-			if($this->getItem($i)->getTimeshared() === $timeshared) {
+			if($this->getItem($i)->getTask() === $Task) {
 				return $this->getItem($i);
 			}
 		}
-	throw new \RuntimeException("Task '". get_class($timeshared)."' not found in '". get_class($this)."'");
+	throw new \RuntimeException("Task '". get_class($Task)."' not found in '". get_class($this)."'");
 	}
 
-	public function hasItemByTask(Timeshared $timeshared): bool {
+	public function hasItemByTask(Task $Task): bool {
 		for($i = 0; $i < $this->getCount(); $i++) {
-			if($this->getItem($i)->getTimeshared() === $timeshared) {
+			if($this->getItem($i)->getTask() === $Task) {
 				return true;
 			}
 		}

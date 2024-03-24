@@ -2,7 +2,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use \plibv4\process\Timeshare;
-use \plibv4\process\Timeshared;
+use \plibv4\process\Task;
 use \plibv4\process\TimeshareObserver;
 use \plibv4\process\TimeshareObservers;
 class TimeshareObserversTest extends TestCase {

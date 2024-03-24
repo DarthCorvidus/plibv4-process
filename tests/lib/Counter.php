@@ -1,5 +1,5 @@
 <?php
-class Counter implements plibv4\process\Timeshared {
+class Counter implements plibv4\process\Task {
 	private int $max = 0;
 	private int $count = 0;
 	public int $terminated = 0;

@@ -1,10 +1,10 @@
 <?php
 namespace plibv4\process;
 interface TimeshareObserver {
-	function onAdd(Timeshare $timeshare, Timeshared $timeshared): void;
-	function onStart(Timeshare $timeshare, Timeshared $timeshared): void;
-	function onRemove(Timeshare $timeshare, Timeshared $timeshared, int $step): void;
-	function onError(Timeshare $timeshare, Timeshared $timeshared, \Exception $e, int $step): void;
-	function onPause(Timeshare $timeshare, Timeshared $timeshared): void;
-	function onResume(Timeshare $timeshare, Timeshared $timeshared): void;
+	function onAdd(Timeshare $timeshare, Task $Task): void;
+	function onStart(Timeshare $timeshare, Task $Task): void;
+	function onRemove(Timeshare $timeshare, Task $Task, int $step): void;
+	function onError(Timeshare $timeshare, Task $Task, \Exception $e, int $step): void;
+	function onPause(Timeshare $timeshare, Task $Task): void;
+	function onResume(Timeshare $timeshare, Task $Task): void;
 }

@@ -1,6 +1,6 @@
 <?php
 namespace plibv4\process;
-class Timeshare implements Timeshared {
+class Timeshare implements Task {
 	private Strategy $strategy;
 	private int $timeout = 30*1000000;
 	private TimeshareObservers $timeshareObservers;
@@ -33,8 +33,8 @@ class Timeshare implements Timeshared {
 		return $this->strategy->getCount();
 	}
 	
-	function addTimeshared(Timeshared $timeshared): void {
-		$this->strategy->add(new TaskEnvelope($this, $timeshared, $this->timeshareObservers));
+	function addTask(Task $Task): void {
+		$this->strategy->add(new TaskEnvelope($this, $Task, $this->timeshareObservers));
 	}
 	
 	function __tsFinish(): void {
@@ -45,12 +45,12 @@ class Timeshare implements Timeshared {
 		
 	}
 	
-	private function callFinish(Timeshared $timeshared): void {
+	private function callFinish(Task $Task): void {
 		try {
-			$timeshared->__tsFinish();
+			$Task->__tsFinish();
 		} catch (\Exception $e) {
-			$this->timeshareObservers->onError($this, $timeshared, $e, Timeshare::FINISH);
-			$timeshared->__tsError($e, Timeshare::FINISH);
+			$this->timeshareObservers->onError($this, $Task, $e, Timeshare::FINISH);
+			$Task->__tsError($e, Timeshare::FINISH);
 		return;
 		}
 	}
@@ -58,9 +58,9 @@ class Timeshare implements Timeshared {
 	private function remove(TaskEnvelope $taskEnvelope, int $status): void {
 		$this->strategy->remove($taskEnvelope);
 		if($status === Timeshare::FINISH) {
-			$this->callFinish($taskEnvelope->getTimeshared());
+			$this->callFinish($taskEnvelope->getTask());
 		}
-		$this->timeshareObservers->onRemove($this, $taskEnvelope->getTimeshared(), $status);
+		$this->timeshareObservers->onRemove($this, $taskEnvelope->getTask(), $status);
 	return;
 	}
 
@@ -110,32 +110,32 @@ class Timeshare implements Timeshared {
 		throw $e;
 	}
 	
-	public function hasTimeshared(Timeshared $timeshared): bool {
-		return $this->strategy->hasItemByTask($timeshared);
+	public function hasTask(Task $Task): bool {
+		return $this->strategy->hasItemByTask($Task);
 	}
 	
-	private function getTaskEnvelope(Timeshared $timeshared): TaskEnvelope {
+	private function getTaskEnvelope(Task $Task): TaskEnvelope {
 		try {
-			$taskEnvelope = $this->strategy->getItemByTask($timeshared);
+			$taskEnvelope = $this->strategy->getItemByTask($Task);
 			return $taskEnvelope;
 		} catch (\Exception $ex) {
-			throw new \RuntimeException("Task '". get_class($timeshared)."' not found in Scheduler '". get_class($this)."'");
+			throw new \RuntimeException("Task '". get_class($Task)."' not found in Scheduler '". get_class($this)."'");
 		}
 	}
 	
-	public function terminate(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->terminate();
+	public function terminate(Task $Task): void {
+		$this->getTaskEnvelope($Task)->terminate();
 	}
 	
-	public function kill(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->kill();
+	public function kill(Task $Task): void {
+		$this->getTaskEnvelope($Task)->kill();
 	}
 	
-	public function pause(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->pause();
+	public function pause(Task $Task): void {
+		$this->getTaskEnvelope($Task)->pause();
 	}
 	
-	public function resume(Timeshared $timeshared): void {
-		$this->getTaskEnvelope($timeshared)->resume();
+	public function resume(Task $Task): void {
+		$this->getTaskEnvelope($Task)->resume();
 	}
 }
