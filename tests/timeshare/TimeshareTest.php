@@ -2,10 +2,11 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
+use plibv4\process\Scheduler;
 class TimeshareTest extends TestCase {
 	function testConstruct() {
 		$construct = new plibv4\process\Timeshare();
-		$this->assertInstanceOf(\plibv4\process\Timeshare::class, $construct);
+		$this->assertInstanceOf(\plibv4\process\Scheduler::class, $construct);
 	}
 	
 	function testGetCountZero() {
@@ -211,7 +212,7 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTask($count);
 		$timeshare->run();
 		$this->assertSame(1, $count->exceptionThrown);
-		$this->assertSame(plibv4\process\Timeshare::START, $count->exceptionStep);
+		$this->assertSame(Scheduler::START, $count->exceptionStep);
 		$this->assertSame("exception at start", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}
@@ -223,7 +224,7 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTask($count);
 		$timeshare->run();
 		$this->assertSame(1, $count->exceptionThrown);
-		$this->assertSame(\plibv4\process\Timeshare::LOOP, $count->exceptionStep);
+		$this->assertSame(Scheduler::LOOP, $count->exceptionStep);
 		$this->assertSame("This exception is an expection.", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}
@@ -235,7 +236,7 @@ class TimeshareTest extends TestCase {
 		$timeshare->addTask($count);
 		$timeshare->run();
 		$this->assertSame(1, $count->exceptionThrown);
-		$this->assertSame(\plibv4\process\Timeshare::FINISH, $count->exceptionStep);
+		$this->assertSame(\plibv4\process\Scheduler::FINISH, $count->exceptionStep);
 		$this->assertSame("exception at finish.", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}

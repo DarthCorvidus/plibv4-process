@@ -5,6 +5,7 @@ use plibv4\process\TimeshareObservers;
 use plibv4\process\TimeshareObserver;
 use plibv4\process\TaskEnvelope;
 use plibv4\process\Timeshare;
+use plibv4\process\Scheduler;
 use plibv4\process\Task;
 class TaskEnvelopeTest extends TestCase {
 	function testConstruct() {
@@ -39,7 +40,7 @@ class TaskEnvelopeTest extends TestCase {
 		$task->exceptionStart = true;
 		$envelope = new TaskEnvelope($scheduler, $task, $observers);
 		$envelope->loop();
-		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::START, 1);
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Scheduler::START, 1);
 		$this->assertSame(0, $task->getCount());
 	}
 	
@@ -82,7 +83,7 @@ class TaskEnvelopeTest extends TestCase {
 		while($envelope->loop()) {
 			
 		}
-		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::LOOP, 1);
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Scheduler::LOOP, 1);
 		$this->assertSame("This exception is an expection.", $task->exceptionReceived->getMessage());
 		$this->assertSame(15, $task->getCount());
 	}
@@ -118,7 +119,7 @@ class TaskEnvelopeTest extends TestCase {
 			$envelope->loop();
 		}
 		$envelope->pause();
-		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::PAUSE, 1);
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Scheduler::PAUSE, 1);
 	}
 
 	function testResume() {
@@ -153,6 +154,6 @@ class TaskEnvelopeTest extends TestCase {
 		}
 		$envelope->pause();
 		$envelope->resume();
-		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Timeshare::RESUME, 1);
+		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Scheduler::RESUME, 1);
 	}
 }

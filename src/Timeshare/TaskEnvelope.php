@@ -29,10 +29,10 @@ class TaskEnvelope {
 			$this->taskObservers->onStart($this->scheduler, $this->task);
 			$this->started = true;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Timeshare::START);
-			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::START);
-			$this->state = Timeshare::ERROR;
-			#$this->scheduler->remove($this->task, Timeshare::ERROR);
+			$this->task->__tsError($e, Scheduler::START);
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::START);
+			$this->state = Scheduler::ERROR;
+			#$this->scheduler->remove($this->task, Scheduler::ERROR);
 		}
 	}
 	
@@ -43,15 +43,15 @@ class TaskEnvelope {
 		try {
 			$result = $this->task->__tsLoop();
 			if($result == false) {
-				$this->state = Timeshare::FINISH;
-				#$this->scheduler->remove($this->task, Timeshare::FINISH);
+				$this->state = Scheduler::FINISH;
+				#$this->scheduler->remove($this->task, Scheduler::FINISH);
 			}
 			return $result;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Timeshare::LOOP);
-			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::LOOP);
-			$this->state = Timeshare::ERROR;
-			#$this->scheduler->remove($this->task, Timeshare::ERROR);
+			$this->task->__tsError($e, Scheduler::LOOP);
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::LOOP);
+			$this->state = Scheduler::ERROR;
+			#$this->scheduler->remove($this->task, Scheduler::ERROR);
 		return false;
 		}
 	}
@@ -59,13 +59,13 @@ class TaskEnvelope {
 	private function runTerminate(): bool {
 		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
 			$this->kill();
-			$this->state = Timeshare::KILL;
-			#$this->scheduler->remove($this->task, Timeshare::KILL);
+			$this->state = Scheduler::KILL;
+			#$this->scheduler->remove($this->task, Scheduler::KILL);
 		return true;
 		}
 		if($this->task->__tsTerminate()) {
-			$this->state = Timeshare::TERMINATE;
-			#this->scheduler->remove($this->task, Timeshare::TERMINATE);
+			$this->state = Scheduler::TERMINATE;
+			#this->scheduler->remove($this->task, Scheduler::TERMINATE);
 		return true;
 		}
 	return false;
@@ -87,8 +87,8 @@ class TaskEnvelope {
 
 	public function kill(): void {
 		$this->task->__tsKill();
-		$this->state = Timeshare::KILL;
-		#$this->scheduler->remove($this->task, Timeshare::KILL);
+		$this->state = Scheduler::KILL;
+		#$this->scheduler->remove($this->task, Scheduler::KILL);
 	}
 
 	public function pause(): void {
@@ -97,9 +97,9 @@ class TaskEnvelope {
 			$this->taskObservers->onPause($this->scheduler, $this->task);
 			$this->paused = true;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Timeshare::PAUSE);
-			$this->state = Timeshare::PAUSE;
-			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::PAUSE);
+			$this->task->__tsError($e, Scheduler::PAUSE);
+			$this->state = Scheduler::PAUSE;
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::PAUSE);
 		}
 	}
 
@@ -109,9 +109,9 @@ class TaskEnvelope {
 			$this->taskObservers->onResume($this->scheduler, $this->task);
 			$this->paused = false;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Timeshare::RESUME);
-			$this->state = Timeshare::RESUME;
-			$this->taskObservers->onError($this->scheduler, $this->task, $e, Timeshare::RESUME);
+			$this->task->__tsError($e, Scheduler::RESUME);
+			$this->state = Scheduler::RESUME;
+			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::RESUME);
 		}
 	}
 

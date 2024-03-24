@@ -1,6 +1,14 @@
 <?php
 namespace plibv4\process;
 interface Scheduler {
+	const START = 1;
+	const LOOP = 2;
+	const FINISH = 3;
+	const TERMINATE = 4;
+	const PAUSE = 5;
+	const RESUME = 6;
+	const KILL = 7;
+	const ERROR = 255;
 	/**
 	 * Adds an observer.
 	 * @param TimeshareObserver $observer

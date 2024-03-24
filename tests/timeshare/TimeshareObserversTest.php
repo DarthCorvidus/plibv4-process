@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \plibv4\process\Timeshare;
-use \plibv4\process\Task;
-use \plibv4\process\TimeshareObserver;
-use \plibv4\process\TimeshareObservers;
+use plibv4\process\Timeshare;
+use plibv4\process\Task;
+use plibv4\process\Scheduler;
+use plibv4\process\TimeshareObserver;
+use plibv4\process\TimeshareObservers;
 class TimeshareObserversTest extends TestCase {
 	public function testAddObserver() {
 		$timeshare = new TimeshareObservers();
@@ -60,8 +61,8 @@ class TimeshareObserversTest extends TestCase {
 		$obs->addTimeshareObserver($to);
 		$count = new Counter(15);
 		
-		$obs->onRemove($timeshare, $count, Timeshare::FINISH);
-		$to->onRemoveCalled($timeshare, $count, Timeshare::FINISH, 1);
+		$obs->onRemove($timeshare, $count, Scheduler::FINISH);
+		$to->onRemoveCalled($timeshare, $count, Scheduler::FINISH, 1);
 	}
 
 	function testOnPause() {
@@ -97,8 +98,8 @@ class TimeshareObserversTest extends TestCase {
 		$count = new Counter(15);
 		$ex = new \Exception("test");
 		
-		$obs->onError($timeshare, $count, $ex, Timeshare::FINISH);
-		$to->onErrorCalled($timeshare, $count, $ex, Timeshare::FINISH, 1);
+		$obs->onError($timeshare, $count, $ex, Scheduler::FINISH);
+		$to->onErrorCalled($timeshare, $count, $ex, Scheduler::FINISH, 1);
 	}
 
 }

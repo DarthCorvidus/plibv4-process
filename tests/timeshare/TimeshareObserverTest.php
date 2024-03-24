@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
-use \plibv4\process\Timeshare;
-use \plibv4\process\Task;
-use \plibv4\process\TimeshareObserver;
+use plibv4\process\Timeshare;
+use plibv4\process\Task;
+use plibv4\process\TimeshareObserver;
+use plibv4\process\Scheduler;
 class TimeshareObserverTest extends TestCase {
 	private int $addCount = 0;
 	private int $lastStatus = 0;
@@ -65,7 +66,7 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count02);
 		$timeshare->run();
 		
-		$to->onRemoveCalled($timeshare, $count02, Timeshare::FINISH, 2);
+		$to->onRemoveCalled($timeshare, $count02, Scheduler::FINISH, 2);
 	}
 	
 	public function testOnRemoveTerminated() {
@@ -84,7 +85,7 @@ class TimeshareObserverTest extends TestCase {
 			}
 			$i++;
 		}
-		$to->onRemoveCalled($timeshare, $count01, Timeshare::TERMINATE, 2);
+		$to->onRemoveCalled($timeshare, $count01, Scheduler::TERMINATE, 2);
 	}
 
 	public function testOnErrorStart() {
@@ -99,11 +100,11 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
 		$timeshare->__tsLoop();
-		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Timeshare::START, 1);
+		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::START, 1);
 		$this->assertSame(0, $count01->getCount());
 
 		$timeshare->run();
-		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Timeshare::START, 2);
+		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Scheduler::START, 2);
 		$this->assertSame(0, $count02->getCount());
 	}
 
@@ -122,10 +123,10 @@ class TimeshareObserverTest extends TestCase {
 			$timeshare->__tsLoop();
 			$timeshare->__tsLoop();
 		}
-		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Timeshare::LOOP, 1);
+		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::LOOP, 1);
 
 		$timeshare->run();
-		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Timeshare::LOOP, 2);
+		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Scheduler::LOOP, 2);
 		
 		$this->assertSame(10, $count01->getCount());
 		$this->assertSame(13, $count02->getCount());
@@ -147,12 +148,12 @@ class TimeshareObserverTest extends TestCase {
 			$timeshare->__tsLoop();
 			$timeshare->__tsLoop();
 		}
-		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Timeshare::FINISH, 1);
+		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::FINISH, 1);
 		$this->assertSame(15, $count01->getCount());
 
 		$timeshare->run();
 		
-		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Timeshare::FINISH, 2);
+		$to->onErrorCalled($timeshare, $count02, $count02->exceptionReceived, Scheduler::FINISH, 2);
 		$this->assertSame(15, $count01->getCount());
 		$this->assertSame(20, $count02->getCount());
 	}	

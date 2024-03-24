@@ -4,14 +4,6 @@ class Timeshare implements Task, Scheduler {
 	private Strategy $strategy;
 	private int $timeout = 30*1000000;
 	private TimeshareObservers $timeshareObservers;
-	const START = 1;
-	const LOOP = 2;
-	const FINISH = 3;
-	const TERMINATE = 4;
-	const PAUSE = 5;
-	const RESUME = 6;
-	const KILL = 7;
-	const ERROR = 255;
 	function __construct() {
 		$this->timeshareObservers = new TimeshareObservers();
 		$this->strategy = new RoundRobin();
@@ -49,15 +41,15 @@ class Timeshare implements Task, Scheduler {
 		try {
 			$task->__tsFinish();
 		} catch (\Exception $e) {
-			$this->timeshareObservers->onError($this, $task, $e, Timeshare::FINISH);
-			$task->__tsError($e, Timeshare::FINISH);
+			$this->timeshareObservers->onError($this, $task, $e, Scheduler::FINISH);
+			$task->__tsError($e, Scheduler::FINISH);
 		return;
 		}
 	}
 	
 	private function remove(TaskEnvelope $taskEnvelope, int $status): void {
 		$this->strategy->remove($taskEnvelope);
-		if($status === Timeshare::FINISH) {
+		if($status === Scheduler::FINISH) {
 			$this->callFinish($taskEnvelope->getTask());
 		}
 		$this->timeshareObservers->onRemove($this, $taskEnvelope->getTask(), $status);
