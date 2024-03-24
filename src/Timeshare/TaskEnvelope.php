@@ -2,13 +2,13 @@
 namespace plibv4\process;
 class TaskEnvelope {
 	private Task $task;
-	private Timeshare $scheduler;
+	private Scheduler $scheduler;
 	private TimeshareObservers $taskObservers;
 	private bool $started = false;
 	private ?int $terminatedAt = null;
 	private bool $paused = false;
 	private ?int $state = null;
-	function __construct(Timeshare $scheduler, Task $task, TimeshareObservers $observers) {
+	function __construct(Scheduler $scheduler, Task $task, TimeshareObservers $observers) {
 		$this->task = $task;
 		$this->taskObservers = $observers;
 		$this->scheduler = $scheduler;
