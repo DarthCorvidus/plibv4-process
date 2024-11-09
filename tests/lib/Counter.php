@@ -1,4 +1,5 @@
 <?php
+use plibv4\process\Scheduler;
 class Counter implements plibv4\process\Task {
 	private int $max = 0;
 	private int $count = 0;
@@ -27,7 +28,7 @@ class Counter implements plibv4\process\Task {
 		return $this->count;
 	}
 
-	public function __tsFinish(): void {
+	public function __tsFinish(Scheduler $sched): void {
 		if($this->exceptionFinish) {
 			$this->exceptionThrown++;
 			throw new \RuntimeException("exception at finish.");
@@ -35,11 +36,11 @@ class Counter implements plibv4\process\Task {
 		$this->finished++;
 	}
 
-	public function __tsKill(): void {
+	public function __tsKill(Scheduler $sched): void {
 		
 	}
 
-	public function __tsLoop(): bool {
+	public function __tsLoop(Scheduler $sched): bool {
 		$this->count++;
 		if($this->count == $this->exceptionOn) {
 			$this->exceptionThrown++;
@@ -48,21 +49,21 @@ class Counter implements plibv4\process\Task {
 	return $this->count < $this->max;
 	}
 
-	public function __tsPause(): void {
+	public function __tsPause(Scheduler $sched): void {
 		if($this->exceptionPause) {
 			$this->exceptionThrown++;
 			throw new \RuntimeException("exception at pause.");
 		}
 	}
 
-	public function __tsResume(): void {
+	public function __tsResume(Scheduler $sched): void {
 		if($this->exceptionResume) {
 			$this->exceptionThrown++;
 			throw new \RuntimeException("exception at resume.");
 		}
 	}
 
-	public function __tsStart(): void {
+	public function __tsStart(Scheduler $sched): void {
 		if($this->exceptionStart) {
 			$this->exceptionThrown++;
 			throw new \RuntimeException("exception at start");
@@ -70,12 +71,12 @@ class Counter implements plibv4\process\Task {
 		$this->started++;
 	}
 
-	public function __tsTerminate(): bool {
+	public function __tsTerminate(Scheduler $sched): bool {
 		$this->terminated++;
 		return $this->count % $this->modulo == 0;
 	}
 	
-	public function __tsError(\Exception $e, int $step): void {
+	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
 		$this->exceptionReceived = $e;
 		$this->exceptionStep = $step;
 	}

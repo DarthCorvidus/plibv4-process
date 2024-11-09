@@ -25,11 +25,11 @@ class TaskEnvelope {
 	
 	private function runStart(): void {
 		try {
-			$this->task->__tsStart();
+			$this->task->__tsStart($this->scheduler);
 			$this->taskObservers->onStart($this->scheduler, $this->task);
 			$this->started = true;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Scheduler::START);
+			$this->task->__tsError($this->scheduler, $e, Scheduler::START);
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::START);
 			$this->state = Scheduler::ERROR;
 			#$this->scheduler->remove($this->task, Scheduler::ERROR);
@@ -41,14 +41,14 @@ class TaskEnvelope {
 			return true;
 		}
 		try {
-			$result = $this->task->__tsLoop();
+			$result = $this->task->__tsLoop($this->scheduler);
 			if($result == false) {
 				$this->state = Scheduler::FINISH;
 				#$this->scheduler->remove($this->task, Scheduler::FINISH);
 			}
 			return $result;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Scheduler::LOOP);
+			$this->task->__tsError($this->scheduler, $e, Scheduler::LOOP);
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::LOOP);
 			$this->state = Scheduler::ERROR;
 			#$this->scheduler->remove($this->task, Scheduler::ERROR);
@@ -63,7 +63,7 @@ class TaskEnvelope {
 			#$this->scheduler->remove($this->task, Scheduler::KILL);
 		return true;
 		}
-		if($this->task->__tsTerminate()) {
+		if($this->task->__tsTerminate($this->scheduler)) {
 			$this->state = Scheduler::TERMINATE;
 			#this->scheduler->remove($this->task, Scheduler::TERMINATE);
 		return true;
@@ -86,18 +86,18 @@ class TaskEnvelope {
 	}
 
 	public function kill(): void {
-		$this->task->__tsKill();
+		$this->task->__tsKill($this->scheduler);
 		$this->state = Scheduler::KILL;
 		#$this->scheduler->remove($this->task, Scheduler::KILL);
 	}
 
 	public function pause(): void {
 		try {
-			$this->task->__tsPause();
+			$this->task->__tsPause($this->scheduler);
 			$this->taskObservers->onPause($this->scheduler, $this->task);
 			$this->paused = true;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Scheduler::PAUSE);
+			$this->task->__tsError($this->scheduler, $e, Scheduler::PAUSE);
 			$this->state = Scheduler::PAUSE;
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::PAUSE);
 		}
@@ -105,11 +105,11 @@ class TaskEnvelope {
 
 	public function resume(): void {
 		try {
-			$this->task->__tsResume();
+			$this->task->__tsResume($this->scheduler);
 			$this->taskObservers->onResume($this->scheduler, $this->task);
 			$this->paused = false;
 		} catch (\Exception $e) {
-			$this->task->__tsError($e, Scheduler::RESUME);
+			$this->task->__tsError($this->scheduler, $e, Scheduler::RESUME);
 			$this->state = Scheduler::RESUME;
 			$this->taskObservers->onError($this->scheduler, $this->task, $e, Scheduler::RESUME);
 		}

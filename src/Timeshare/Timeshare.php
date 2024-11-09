@@ -29,20 +29,20 @@ class Timeshare implements Task, Scheduler {
 		$this->strategy->add(new TaskEnvelope($this, $task, $this->timeshareObservers));
 	}
 	
-	function __tsFinish(): void {
+	function __tsFinish(Scheduler $sched): void {
 		
 	}
 
-	public function __tsStart(): void {
+	public function __tsStart(Scheduler $sched): void {
 		
 	}
 	
 	private function callFinish(Task $task): void {
 		try {
-			$task->__tsFinish();
+			$task->__tsFinish($this);
 		} catch (\Exception $e) {
 			$this->timeshareObservers->onError($this, $task, $e, Scheduler::FINISH);
-			$task->__tsError($e, Scheduler::FINISH);
+			$task->__tsError($this, $e, Scheduler::FINISH);
 		return;
 		}
 	}
@@ -56,7 +56,7 @@ class Timeshare implements Task, Scheduler {
 	return;
 	}
 
-	public function __tsLoop(): bool {
+	public function __tsLoop(Scheduler $sched): bool {
 		if($this->strategy->getCount() === 0) {
 			return false;
 		}
@@ -67,21 +67,27 @@ class Timeshare implements Task, Scheduler {
 	return true;
 	}
 
-	public function __tsKill(): void {
+	public function __tsKill(Scheduler $sched): void {
 		for($i = 0; $i < $this->strategy->getCount(); $i++) {
 			$this->strategy->getItem($i)->kill();
 		}
 	}
 
-	public function __tsPause(): void {
+	public function __tsPause(Scheduler $sched): void {
 		
 	}
 
-	public function __tsResume(): void {
+	public function __tsResume(Scheduler $sched): void {
 		
 	}
 
-	public function __tsTerminate(): bool {
+	public function terminateAll(): void {
+		for($i = 0; $i < $this->strategy->getCount(); $i++) {
+			$this->strategy->getItem($i)->terminate();
+		}
+	}
+	
+	public function __tsTerminate(Scheduler $sched): bool {
 		if($this->strategy->getCount()===0) {
 			return true;
 		}
@@ -92,13 +98,13 @@ class Timeshare implements Task, Scheduler {
 	}
 	
 	public function run(): void {
-		while($this->__tsLoop()) {
+		while($this->__tsLoop($this)) {
 			
 		}
 	return;
 	}
 	
-	public function __tsError(\Exception $e, int $step): void {
+	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
 		throw $e;
 	}
 	

@@ -51,6 +51,11 @@ interface Scheduler {
 	 */
 	public function terminate(Task $task): void;
 	/**
+	 * Terminate all Tasks
+	 * @return void
+	 */
+	public function terminateAll(): void;
+	/**
 	 * Kill a certain task.
 	 * @param Task $task
 	 * @return void

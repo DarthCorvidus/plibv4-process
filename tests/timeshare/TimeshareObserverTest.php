@@ -33,6 +33,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 
 	public function testOnStart() {
+		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -42,10 +43,10 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
 
-		$timeshare->__tsLoop();
+		$timeshare->__tsLoop($parent);
 		$to->onStartCalled($timeshare, $count01, 1);
 
-		$timeshare->__tsLoop();
+		$timeshare->__tsLoop($parent);
 		$to->onStartCalled($timeshare, $count02, 2);
 		$timeshare->run();
 
@@ -70,6 +71,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 	
 	public function testOnRemoveTerminated() {
+		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -79,9 +81,9 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
 		$i = 0;
-		while($timeshare->__tsLoop()) {
+		while($timeshare->__tsLoop($parent)) {
 			if($i == 10) {
-				$timeshare->__tsTerminate();
+				$timeshare->__tsTerminate($parent);
 			}
 			$i++;
 		}
@@ -89,6 +91,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 
 	public function testOnErrorStart() {
+		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -99,7 +102,7 @@ class TimeshareObserverTest extends TestCase {
 		
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
-		$timeshare->__tsLoop();
+		$timeshare->__tsLoop($parent);
 		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::START, 1);
 		$this->assertSame(0, $count01->getCount());
 
@@ -109,6 +112,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 
 	public function testOnErrorLoop() {
+		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -120,8 +124,8 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count02);
 		// 11 iterations to trigger the first error
 		for($i = 0; $i <= 10;$i++) {
-			$timeshare->__tsLoop();
-			$timeshare->__tsLoop();
+			$timeshare->__tsLoop($parent);
+			$timeshare->__tsLoop($parent);
 		}
 		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::LOOP, 1);
 
@@ -134,6 +138,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 	
 	public function testOnErrorFinish() {
+		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -145,8 +150,8 @@ class TimeshareObserverTest extends TestCase {
 		$timeshare->addTask($count02);
 		// 11 iterations to trigger the first error
 		for($i = 0; $i <= 15;$i++) {
-			$timeshare->__tsLoop();
-			$timeshare->__tsLoop();
+			$timeshare->__tsLoop($parent);
+			$timeshare->__tsLoop($parent);
 		}
 		$to->onErrorCalled($timeshare, $count01, $count01->exceptionReceived, Scheduler::FINISH, 1);
 		$this->assertSame(15, $count01->getCount());
