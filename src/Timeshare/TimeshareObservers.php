@@ -1,6 +1,7 @@
 <?php
 namespace plibv4\process;
 class TimeshareObservers {
+	/** @var list<TimeshareObserver> */
 	private array $timeshareObservers = array();
 	function addTimeshareObserver(TimeshareObserver $observer): void {
 		if(array_search($observer, $this->timeshareObservers)!==false) {

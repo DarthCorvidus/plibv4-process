@@ -1,6 +1,7 @@
 <?php
 namespace plibv4\process;
 class RoundRobin implements Strategy {
+	/** @var list<TaskEnvelope> */
 	private array $tasks = [];
 	private int $count = 0;
 	private ?int $pointer = null;
@@ -12,15 +13,18 @@ class RoundRobin implements Strategy {
 		return $this->count;
 	}
 	
-	public function add(TaskEnvelope $task) {
-		$this->tasks[$this->count] = $task;
-		if($this->count == 0) {
+	public function add(TaskEnvelope $task): void {
+		$this->tasks[] = $task;
+		if($this->count === 0) {
 			$this->pointer = 0;
 		}
 		$this->count++;
 	}
 
 	public function getCurrent(): TaskEnvelope {
+		if($this->pointer === null) {
+			throw new \RuntimeException("no current task");
+		}
 		return $this->tasks[$this->pointer];
 	}
 
@@ -31,6 +35,9 @@ class RoundRobin implements Strategy {
 	}
 
 	public function increment(): void {
+		if($this->pointer === null) {
+			throw new \RuntimeException("pointer unexpectedly null");
+		}
 		if($this->pointer == $this->count - 1) {
 			$this->pointer = 0;
 		return;
@@ -42,7 +49,10 @@ class RoundRobin implements Strategy {
 		return $this->count == null;
 	}
 
-	private function modifyPointer($key) {
+	private function modifyPointer(int $key): void {
+		if($this->pointer === null) {
+			throw new \RuntimeException("pointer unexpectedly null");
+		}
 		if($this->pointer>$key) {
 			$this->pointer--;
 		}
@@ -51,7 +61,7 @@ class RoundRobin implements Strategy {
 		}
 	}
 	
-	public function remove(TaskEnvelope $task) {
+	public function remove(TaskEnvelope $task): void {
 		$new = array();
 		foreach($this->tasks as $key => $value) {
 			if($value === $task) {
@@ -67,10 +77,6 @@ class RoundRobin implements Strategy {
 		}
 	}
 
-	public function isValid(): bool {
-		
-	}
-	
 	public function getItem(int $item): TaskEnvelope {
 		return $this->tasks[$item];
 	}

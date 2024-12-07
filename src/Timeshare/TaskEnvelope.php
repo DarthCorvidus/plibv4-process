@@ -16,6 +16,9 @@ class TaskEnvelope {
 	}
 	
 	function getState(): int {
+		if($this->state === null) {
+			throw new \RuntimeException("Unable to determine state");
+		}
 		return $this->state;
 	}
 	
@@ -57,6 +60,10 @@ class TaskEnvelope {
 	}
 	
 	private function runTerminate(): bool {
+		if($this->terminatedAt===null) {
+			// should not happen.
+			throw new \RuntimeException("invalid null value");
+		}
 		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
 			$this->kill();
 			$this->state = Scheduler::KILL;
@@ -117,7 +124,7 @@ class TaskEnvelope {
 
 	public function terminate(): bool {
 		if($this->terminatedAt == null) {
-			$this->terminatedAt = microtime(true)*1000000;
+			$this->terminatedAt = (int)(microtime(true)*1000000);
 		}
 	return false;
 	}
