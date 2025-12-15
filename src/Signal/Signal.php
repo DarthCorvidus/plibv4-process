@@ -13,6 +13,7 @@
  * for Signal would be messier.
  */
 class Signal {
+	/** @var array<int, list<SignalHandler>> */
 	private array $handlers = array();
 	static private ?Signal $instance = null;
 	private function __construct() {
