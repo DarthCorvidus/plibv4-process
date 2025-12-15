@@ -1,5 +1,6 @@
 <?php
 class ProcessPool {
+	/** @var array<string, Process> */
 	private array $pool = array();
 	function __construct() {
 		;
