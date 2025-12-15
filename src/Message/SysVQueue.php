@@ -1,6 +1,6 @@
 <?php
 class SysVQueue implements SignalHandler {
-	private mixed $queue;
+	private SysvMessageQueue $queue;
 	private ?MessageListener $listener = null;
 	function __construct(int $id) {
 		$this->queue = msg_get_queue($id);
@@ -32,11 +32,14 @@ class SysVQueue implements SignalHandler {
 	
 	function getMessage(): Message {
 		$stat = $this->getStat();
-		$max = $stat["msg_qbytes"];
+		$max = (int)$stat["msg_qbytes"];
 		$message = "";
 		$received = 0;
-		msg_receive($this->queue, 0, $received, $stat["msg_qbytes"], $message);
-	return $message;
+		msg_receive($this->queue, 0, $received, $max, $message);
+		if($message instanceof Message) {
+			return $message;
+		}
+	throw new RuntimeException("unable to receive message");
 	}
 	
 	function getStat(): array {
