@@ -1,4 +1,4 @@
 <?php
 interface MessageListener {
-	function onMessage(Message $message);
+	function onMessage(Message $message): void;
 }

@@ -1,9 +1,9 @@
 <?php
 class Message {
-	private $message;
-	private $ppid;
-	private $pid;
-	private $time;
+	private string $message;
+	private int $ppid;
+	private int $pid;
+	private int $time;
 	function __construct(string $message) {
 		$this->message = $message;
 		$this->pid = posix_getpid();
@@ -11,7 +11,7 @@ class Message {
 		$this->ppid = posix_getppid();
 	}
 	
-	function getMessage() {
+	function getMessage(): string {
 		return $this->message;
 	}
 	

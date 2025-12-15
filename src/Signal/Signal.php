@@ -13,20 +13,20 @@
  * for Signal would be messier.
  */
 class Signal {
-	private $handlers = array();
-	static private $instance;
+	private array $handlers = array();
+	static private ?Signal $instance = null;
 	private function __construct() {
 		
 	}
 	
 	static function get(): Signal {
-		if(self::$instance == NULL) {
+		if(self::$instance === NULL) {
 			self::$instance = new Signal();
 		}
 	return self::$instance;
 	}
 	
-	function addSignalHandler(int $signal, SignalHandler $handler) {
+	function addSignalHandler(int $signal, SignalHandler $handler): void {
 		if(!isset($this->handlers[$signal])) {
 			$this->handlers[$signal] = array();
 			pcntl_signal($signal, array($this, "call"));
@@ -34,7 +34,7 @@ class Signal {
 		$this->handlers[$signal][] = $handler;
 	}
 	
-	function clearSignal(int $signal) {
+	function clearSignal(int $signal): void {
 		$this->handlers[$signal] = array();
 		pcntl_signal($signal, SIG_DFL);
 	}
@@ -44,7 +44,7 @@ class Signal {
 	 * @param SignalHandler $handler
 	 * @param int $signal
 	 */
-	function clearHandler(SignalHandler $handler, int $signal = NULL) {
+	function clearHandler(SignalHandler $handler, int $signal = NULL): void {
 		foreach($this->handlers as $sig => $handlers) {
 			if($signal!==NULL && $sig!=$signal) {
 				continue;
@@ -57,7 +57,7 @@ class Signal {
 		}
 	}
 	
-	function call(int $signal, array $info) {
+	function call(int $signal, array $info): void {
 		foreach($this->handlers[$signal] as $value) {
 			$value->onSignal($signal, $info);
 		}

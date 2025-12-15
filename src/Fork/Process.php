@@ -1,9 +1,9 @@
 <?php
 class Process implements SignalHandler {
-	private $runner;
-	private $listener;
-	private $pid;
-	private $signal;
+	private Runner $runner;
+	private ?ProcessListener $listener = null;
+	private ?int $pid = null;
+	private Signal $signal;
 	function __construct(Runner $runner) {
 		if(pcntl_async_signals()!==TRUE) {
 			throw new ErrorException("Process needs pcntl_async_signal() to be TRUE.");
@@ -12,13 +12,13 @@ class Process implements SignalHandler {
 		$this->signal = Signal::get();
 	}
 	
-	public function onSignal(int $signal, array $info) {
+	public function onSignal(int $signal, array $info): void {
 		/**
 		 * SIGCHLD is sent on SIGSTOP/SIGCONT as well. We want to call onEnd
 		 * only when the process has exited.
 		 * TODO: the exit code should be used too.
 		 */
-		$result = pcntl_waitpid($this->pid, $status, WNOHANG);
+		$result = pcntl_waitpid($this->getPid(), $status, WNOHANG);
 		if($result==$this->getPid() && $this->listener!=NULL) {
 			$this->listener->onEnd($this);
 		}
@@ -33,36 +33,39 @@ class Process implements SignalHandler {
 		return $this->runner;
 	}
 	
-	public function getPid() {
+	public function getPid(): int {
+		if($this->pid === null) {
+			throw new Exception("no pid yet, process was not forked.");
+		}
 		return $this->pid;
 	}
 	
-	function addProcessListener(ProcessListener $listener) {
+	function addProcessListener(ProcessListener $listener): void {
 		$this->listener = $listener;
 	}
 
-	public function sigStop() {
-		posix_kill($this->pid, SIGSTOP);
+	public function sigStop(): void {
+		posix_kill($this->getPid(), SIGSTOP);
 	}
 	
-	public function sigCont() {
-		posix_kill($this->pid, SIGCONT);
+	public function sigCont(): void {
+		posix_kill($this->getPid(), SIGCONT);
 	}
 	
-	public function sigTerm() {
-		posix_kill($this->pid, SIGTERM);
+	public function sigTerm(): void {
+		posix_kill($this->getPid(), SIGTERM);
 	}
 	
-	public function triggerListener(\Event $event) {
-		if($this->listener==NULL) {
+	public function triggerListener(\Event $event): void {
+		if($this->listener===null) {
 			return;
 		}
-		if($event->getEventId()=="onStart") {
-			$this->listener->onStart($event);
+		if($event->getEventId()==="onStart") {
+			$this->listener->onStart($this);
 		}
 
-		if($event->getEventId()=="onEnd") {
-			$this->listener->onEnd($event);
+		if($event->getEventId()==="onEnd") {
+			$this->listener->onEnd($this);
 		}
 	}
 	
@@ -71,7 +74,7 @@ class Process implements SignalHandler {
 	 * block the parent process.
 	 * @throws Exception
 	 */
-	function run() {
+	function run(): void {
 		$pid = pcntl_fork();
 		if($pid=="-1") {
 			throw new Exception("Unable to fork");
@@ -103,11 +106,11 @@ class Process implements SignalHandler {
 	 * runAndWait spawns a thread and waits for it to finish, ie blocking the
 	 * calling process.
 	 */
-	function runAndWait() {
+	function runAndWait(): void {
 		$this->run();
 		$status = 0;
-		while(TRUE) {
-			$result = pcntl_waitpid($this->pid, $status, WNOHANG);
+		while(true) {
+			$result = pcntl_waitpid($this->getPid(), $status, WNOHANG);
 			if($result == -1 or $result > 0) {
 				exit(0);
 			}

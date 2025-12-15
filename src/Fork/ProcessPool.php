@@ -1,15 +1,15 @@
 <?php
 class ProcessPool {
-	private $pool = array();
+	private array $pool = array();
 	function __construct() {
 		;
 	}
 	
-	function addProcess(string $id, Process $process) {
+	function addProcess(string $id, Process $process): void {
 		$this->pool[$id] = $process;
 	}
 	
-	function hasProcess(string $id) {
+	function hasProcess(string $id): bool {
 		return isset($this->pool[$id]);
 	}
 	
@@ -20,7 +20,7 @@ class ProcessPool {
 	return $this->pool[$id];
 	}
 	
-	function removeProcess(string $id) {
+	function removeProcess(string $id): void {
 		if(!$this->hasProcess($id)) {
 			throw new OutOfBoundsException("process ".$id." not in process pool");
 		}

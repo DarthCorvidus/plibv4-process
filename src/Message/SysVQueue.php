@@ -1,17 +1,17 @@
 <?php
 class SysVQueue implements SignalHandler {
-	private $queue;
-	private $listener;
+	private mixed $queue;
+	private ?MessageListener $listener = null;
 	function __construct(int $id) {
 		$this->queue = msg_get_queue($id);
 	}
 	
-	function addListener(Signal $signal, MessageListener $listener) {
+	function addListener(Signal $signal, MessageListener $listener): void {
 		$signal->addSignalHandler(SIGALRM, $this);
 		$this->listener = $listener;
 	}
 	
-	function onSignal(int $signal, array $info) {
+	function onSignal(int $signal, array $info): void {
 		if($this->hasMessage()) {
 			$message = $this->getMessage();
 			if($this->listener!=NULL) {
@@ -20,12 +20,12 @@ class SysVQueue implements SignalHandler {
 		}
 	}
 	
-	function sendMessage(string $message, int $type) {
+	function sendMessage(string $message, int $type): void {
 		msg_send($this->queue, $type, new Message($message));
 		posix_kill(posix_getpid(), SIGALRM);
 	}
 	
-	function sendHyperwave(string $message, int $type, int $pid) {
+	function sendHyperwave(string $message, int $type, int $pid): void {
 		msg_send($this->queue, $type, new Message($message));
 		posix_kill($pid, SIGALRM);
 	}
@@ -43,16 +43,16 @@ class SysVQueue implements SignalHandler {
 		return msg_stat_queue($this->queue);
 	}
 	
-	function hasMessage() {
+	function hasMessage(): bool {
 		$stat = $this->getStat();
 	return $stat["msg_qnum"]>0;
 	}
 	
-	function remove() {
+	function remove(): void {
 		msg_remove_queue($this->queue);
 	}
 	
-	function clear() {
+	function clear(): void {
 		while($this->hasMessage()) {
 			$this->getMessage();
 		}
