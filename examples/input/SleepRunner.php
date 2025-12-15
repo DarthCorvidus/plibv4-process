@@ -4,7 +4,7 @@ class SleepRunner implements Runner {
 	function __construct(int $seconds) {
 		$this->seconds = $seconds;
 	}
-	public function run() {
+	public function run(): void {
 		sleep($this->seconds);
 	}
 }

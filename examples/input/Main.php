@@ -15,7 +15,7 @@ class Main implements ProcessListener, SignalHandler {
 		$this->inputProcess->addProcessListener($this);
 	}
 	
-	public function onSignal(int $signal, array $info) {
+	public function onSignal(int $signal, array $info): void {
 		if($this->queue->hasMessage() && $signal==SIGALRM) {
 			$this->onMessage($this->queue->getMessage());
 		}
@@ -25,7 +25,7 @@ class Main implements ProcessListener, SignalHandler {
 	 * In many cases, it is not necessary to write yourself a dedicated Listener,
 	 * which would often consist of only a few or one function. 
 	 */
-	public function onMessage(Message $message) {
+	public function onMessage(Message $message): void {
 		if($message->getMessage()=="quit") {
 			$this->inputProcess->sigTerm();
 			exit(0);
@@ -61,13 +61,13 @@ class Main implements ProcessListener, SignalHandler {
 		$this->inputProcess->sigCont();
 	}
 	
-	public function onEnd(Process $process) {
+	public function onEnd(Process $process): void {
 		if($process->getRunnerName() instanceof SleepRunner) {
 			echo "Process '".$process->getRunnerName()."' with pid ".$process->getPid()." ended.".PHP_EOL;
 		}
 	}
 
-	public function onStart(Process $process) {
+	public function onStart(Process $process): void {
 		if($process->getRunner() instanceof SleepRunner) {
 			echo "Process sleep started with pid ".$process->getPid().".".PHP_EOL;
 		}
@@ -77,7 +77,7 @@ class Main implements ProcessListener, SignalHandler {
 	}
 	
 	
-	public function run() {
+	public function run(): void {
 		echo "Enter »quit« to exit program, »help« for help.".PHP_EOL;
 		$this->inputProcess->runAndWait();
 	}

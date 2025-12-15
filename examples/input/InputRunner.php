@@ -5,7 +5,7 @@ class InputRunner implements Runner {
 		$this->message = new SysVQueue(451);
 	}
 	
-	public function run() {
+	public function run(): void {
 		while(TRUE) {
 			echo "> ";
 			$input = trim(fgets(STDIN));
