@@ -6,5 +6,6 @@ class SleepRunner implements Runner {
 	}
 	public function run(): void {
 		sleep($this->seconds);
+		echo "Waking up after ".$this->seconds." seconds.".PHP_EOL;
 	}
 }

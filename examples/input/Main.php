@@ -33,6 +33,7 @@ class Main implements ProcessListener, SignalHandler {
 		if($message->getMessage()=="help") {
 			echo "help - this help.".PHP_EOL;
 			echo "quit - exit program.".PHP_EOL;
+			echo "sleep <n> - sleep <n> seconds in forked process";
 			echo "status - status about process.".PHP_EOL;
 			$this->inputProcess->sigCont();
 			return;
@@ -49,7 +50,7 @@ class Main implements ProcessListener, SignalHandler {
 			$this->inputProcess->sigCont();
 			return;
 		}
-		if($exp[0]=="sleep") {
+		if($exp[0]==="sleep") {
 			$sleep = new SleepRunner($exp[1]);
 			$process = new Process($sleep);
 			$process->addProcessListener($this);
