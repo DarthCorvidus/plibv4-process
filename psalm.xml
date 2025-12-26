@@ -9,7 +9,15 @@
     findUnusedBaselineEntry="true"
     findUnusedCode="false"
 >
-    <projectFiles>
+	<issueHandlers>
+		<ClassMustBeFinal>
+			<errorLevel type="suppress">
+				<directory name="src" />
+			</errorLevel>
+		</ClassMustBeFinal>
+	</issueHandlers>
+		
+	<projectFiles>
         <directory name="src" />
         <ignoreFiles>
             <directory name="vendor" />

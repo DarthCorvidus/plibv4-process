@@ -12,6 +12,7 @@ class Process implements SignalHandler {
 		$this->signal = Signal::get();
 	}
 	
+	#[\Override]
 	public function onSignal(int $signal, array $info): void {
 		/**
 		 * SIGCHLD is sent on SIGSTOP/SIGCONT as well. We want to call onEnd

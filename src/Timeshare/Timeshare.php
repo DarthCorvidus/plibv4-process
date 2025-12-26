@@ -9,30 +9,37 @@ class Timeshare implements Task, Scheduler {
 		$this->strategy = new RoundRobin();
 	}
 	
+	#[\Override]
 	function addTimeshareObserver(TimeshareObserver $observer): void {
 		$this->timeshareObservers->addTimeshareObserver($observer);
 	}
 	
+	#[\Override]
 	function setTimeout(int $seconds, int $microseconds): void {
 		$this->timeout = $seconds*1000000 + $microseconds;
 	}
 	
+	#[\Override]
 	function getTimeout(): int {
 		return $this->timeout;
 	}
 	
+	#[\Override]
 	function getTaskCount(): int {
 		return $this->strategy->getCount();
 	}
 	
+	#[\Override]
 	function addTask(Task $task): void {
 		$this->strategy->add(new TaskEnvelope($this, $task, $this->timeshareObservers));
 	}
 	
+	#[\Override]
 	function __tsFinish(Scheduler $sched): void {
 		
 	}
 
+	#[\Override]
 	public function __tsStart(Scheduler $sched): void {
 		
 	}
@@ -56,6 +63,7 @@ class Timeshare implements Task, Scheduler {
 	return;
 	}
 
+	#[\Override]
 	public function __tsLoop(Scheduler $sched): bool {
 		if($this->strategy->getCount() === 0) {
 			return false;
@@ -67,26 +75,31 @@ class Timeshare implements Task, Scheduler {
 	return true;
 	}
 
+	#[\Override]
 	public function __tsKill(Scheduler $sched): void {
 		for($i = 0; $i < $this->strategy->getCount(); $i++) {
 			$this->strategy->getItem($i)->kill();
 		}
 	}
 
+	#[\Override]
 	public function __tsPause(Scheduler $sched): void {
 		
 	}
 
+	#[\Override]
 	public function __tsResume(Scheduler $sched): void {
 		
 	}
 
+	#[\Override]
 	public function terminateAll(): void {
 		for($i = 0; $i < $this->strategy->getCount(); $i++) {
 			$this->strategy->getItem($i)->terminate();
 		}
 	}
 	
+	#[\Override]
 	public function __tsTerminate(Scheduler $sched): bool {
 		if($this->strategy->getCount()===0) {
 			return true;
@@ -97,6 +110,7 @@ class Timeshare implements Task, Scheduler {
 	return false;
 	}
 	
+	#[\Override]
 	public function run(): void {
 		while($this->__tsLoop($this)) {
 			
@@ -104,10 +118,12 @@ class Timeshare implements Task, Scheduler {
 	return;
 	}
 	
+	#[\Override]
 	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
 		throw $e;
 	}
 	
+	#[\Override]
 	public function hasTask(Task $task): bool {
 		return $this->strategy->hasItemByTask($task);
 	}
@@ -121,18 +137,22 @@ class Timeshare implements Task, Scheduler {
 		}
 	}
 	
+	#[\Override]
 	public function terminate(Task $task): void {
 		$this->getTaskEnvelope($task)->terminate();
 	}
 	
+	#[\Override]
 	public function kill(Task $task): void {
 		$this->getTaskEnvelope($task)->kill();
 	}
 	
+	#[\Override]
 	public function pause(Task $task): void {
 		$this->getTaskEnvelope($task)->pause();
 	}
 	
+	#[\Override]
 	public function resume(Task $task): void {
 		$this->getTaskEnvelope($task)->resume();
 	}

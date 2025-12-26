@@ -64,6 +64,9 @@ class TaskEnvelope {
 			// should not happen.
 			throw new \RuntimeException("invalid null value");
 		}
+		/**
+		 * @psalm-suppress InvalidOperand
+		 */
 		if(microtime(true)*1000000 - $this->terminatedAt >= $this->scheduler->getTimeout()) {
 			$this->kill();
 			$this->state = Scheduler::KILL;
@@ -124,6 +127,9 @@ class TaskEnvelope {
 
 	public function terminate(): bool {
 		if($this->terminatedAt == null) {
+			/**
+			 * @psalm-suppress InvalidOperand
+			 */
 			$this->terminatedAt = (int)(microtime(true)*1000000);
 		}
 	return false;

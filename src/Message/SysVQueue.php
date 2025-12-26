@@ -3,7 +3,11 @@ class SysVQueue implements SignalHandler {
 	private SysvMessageQueue $queue;
 	private ?MessageListener $listener = null;
 	function __construct(int $id) {
-		$this->queue = msg_get_queue($id);
+		$queue = msg_get_queue($id);
+		if($queue === false) {
+			throw new RuntimeException("unable to get queue");
+		}
+		$this->queue = $queue;
 	}
 	
 	function addListener(Signal $signal, MessageListener $listener): void {
@@ -11,6 +15,7 @@ class SysVQueue implements SignalHandler {
 		$this->listener = $listener;
 	}
 	
+	#[\Override]
 	function onSignal(int $signal, array $info): void {
 		if($this->hasMessage()) {
 			$message = $this->getMessage();

@@ -9,10 +9,12 @@ class RoundRobin implements Strategy {
 		
 	}
 	
+	#[\Override]
 	function getCount(): int {
 		return $this->count;
 	}
 	
+	#[\Override]
 	public function add(TaskEnvelope $task): void {
 		$this->tasks[] = $task;
 		if($this->count === 0) {
@@ -21,6 +23,7 @@ class RoundRobin implements Strategy {
 		$this->count++;
 	}
 
+	#[\Override]
 	public function getCurrent(): TaskEnvelope {
 		if($this->pointer === null) {
 			throw new \RuntimeException("no current task");
@@ -28,12 +31,14 @@ class RoundRobin implements Strategy {
 		return $this->tasks[$this->pointer];
 	}
 
+	#[\Override]
 	public function getCurrentIncrement(): TaskEnvelope {
 		$current = $this->getCurrent();
 		$this->increment();
 	return $current;
 	}
 
+	#[\Override]
 	public function increment(): void {
 		if($this->pointer === null) {
 			throw new \RuntimeException("pointer unexpectedly null");
@@ -61,6 +66,7 @@ class RoundRobin implements Strategy {
 		}
 	}
 	
+	#[\Override]
 	public function remove(TaskEnvelope $task): void {
 		$new = array();
 		foreach($this->tasks as $key => $value) {
@@ -77,10 +83,12 @@ class RoundRobin implements Strategy {
 		}
 	}
 
+	#[\Override]
 	public function getItem(int $item): TaskEnvelope {
 		return $this->tasks[$item];
 	}
 	
+	#[\Override]
 	public function getItemByTask(Task $task): TaskEnvelope {
 		for($i = 0; $i < $this->getCount(); $i++) {
 			if($this->getItem($i)->getTask() === $task) {
@@ -90,6 +98,7 @@ class RoundRobin implements Strategy {
 	throw new \RuntimeException("Task '". get_class($task)."' not found in '". get_class($this)."'");
 	}
 
+	#[\Override]
 	public function hasItemByTask(Task $task): bool {
 		for($i = 0; $i < $this->getCount(); $i++) {
 			if($this->getItem($i)->getTask() === $task) {
