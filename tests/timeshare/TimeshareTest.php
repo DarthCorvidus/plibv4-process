@@ -192,8 +192,8 @@ final class TimeshareTest extends TestCase {
 			$timeshare->__tsTerminate($parent);
 		}
 		$passed = microtime(true)*1000000 - $started;
-		$this->assertSame(true, $passed >= 0.9*1000000);
-		$this->assertSame(true, $passed <= 1.1*1000000);
+		$this->assertGreaterThan(0.9*1000000, $passed);
+		$this->assertLessThan(1.1*1000000, $passed);
 	}
 	
 	function testTimeoutMicroeconds(): void {
@@ -207,8 +207,8 @@ final class TimeshareTest extends TestCase {
 			$timeshare->__tsTerminate($parent);
 		}
 		$passed = microtime(true)*1000000 - $started;
-		$this->assertSame(true, $passed >= 0.4*1000000);
-		$this->assertSame(true, $passed <= 0.6*1000000);
+		$this->assertGreaterThan(0.4*1000000, $passed, );
+		$this->assertLessThan(0.6*1000000, $passed);
 	}
 	
 	function testErrorStart(): void {
