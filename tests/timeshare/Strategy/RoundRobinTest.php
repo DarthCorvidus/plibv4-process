@@ -17,6 +17,8 @@ final class RoundRobinTest extends TestCase {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
+		
+		$count = [];
 		$count[] = new TaskEnvelope($ts, new Counter(15), $to);
 		$count[] = new TaskEnvelope($ts, new Counter(20), $to);
 		$count[] = new TaskEnvelope($ts, new Counter(25), $to);
