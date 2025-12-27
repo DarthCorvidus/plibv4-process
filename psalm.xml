@@ -23,12 +23,17 @@
 		<RedundantConditionGivenDocblockType>
 			<errorLevel type="suppress">
 				<file name="tests/timeshare/TrackObserverTest.php" />
+				<file name="tests/timeshare/TimeshareTest.php" />
+				<file name="tests/timeshare/TaskEnvelopeTest.php" />
+				<file name="tests/timeshare/TimeshareObserverTest.php" />
 			</errorLevel>
 		</RedundantConditionGivenDocblockType>
 		<DocblockTypeContradiction>
 			<errorLevel type="suppress">
 				<file name="tests/timeshare/TrackObserverTest.php" />
 				<file name="tests/timeshare/TimeshareTest.php" />
+				<file name="tests/timeshare/TaskEnvelopeTest.php" />
+				<file name="tests/timeshare/CounterTest.php" />
 			</errorLevel>
 		</DocblockTypeContradiction>
 	</issueHandlers>
