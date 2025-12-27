@@ -20,16 +20,6 @@ final class TrackObserver implements TimeshareObserver {
 	public ?\Exception $lastException = null;
 	public int $lastStepError = 0;
 	public int $lastStepRemoved = 0;
-	public function assertSame(mixed $expected, mixed $given): bool {
-		if($expected === $given) {
-			return true;
-		}
-		if(is_scalar($expected) && is_scalar($given)) {
-			throw new \Exception("expected value ".$expected." does not match actual ".$given." value");
-		}
-		throw new \Exception("expected value does not match supplied value");
-	}
-
 	#[\Override]
 	public function onAdd(Scheduler $scheduler, Task $task): void {
 		$this->countAdded++;
