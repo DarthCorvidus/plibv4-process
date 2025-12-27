@@ -186,14 +186,14 @@ final class TimeshareTest extends TestCase {
 		$timeshare = new plibv4\process\Timeshare();
 		$timeshare->addTask(new Stubborn());
 		$timeshare->setTimeout(1, 0);
-		$i = 0;
-		$started = microtime(true)*1000000;
+		
+		$started = hrtime(true);
 		while($timeshare->__tsLoop($parent)) {
 			$timeshare->__tsTerminate($parent);
 		}
-		$passed = microtime(true)*1000000 - $started;
-		$this->assertGreaterThan(0.9*1000000, $passed);
-		$this->assertLessThan(1.1*1000000, $passed);
+		$passed = hrtime(true) - $started;
+		$this->assertGreaterThan(0.9*1000_000_000.0, $passed);
+		$this->assertLessThan(1.1*1_000_000_000.0, $passed);
 	}
 	
 	function testTimeoutMicroeconds(): void {
@@ -202,13 +202,13 @@ final class TimeshareTest extends TestCase {
 		$timeshare->addTask(new Stubborn());
 		$timeshare->setTimeout(0, 500000);
 		$i = 0;
-		$started = microtime(true)*1000000;
+		$started = hrtime(true);
 		while($timeshare->__tsLoop($parent)) {
 			$timeshare->__tsTerminate($parent);
 		}
-		$passed = microtime(true)*1000000 - $started;
-		$this->assertGreaterThan(0.4*1000000, $passed, );
-		$this->assertLessThan(0.6*1000000, $passed);
+		$passed = hrtime(true) - $started;
+		$this->assertGreaterThan(0.4*1_000_000_000.0, $passed);
+		$this->assertLessThan(0.6*1_000_000_000.0, $passed);
 	}
 	
 	function testErrorStart(): void {
