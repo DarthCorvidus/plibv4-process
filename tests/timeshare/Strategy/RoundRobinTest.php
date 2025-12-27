@@ -7,13 +7,13 @@ use \plibv4\process\RoundRobin;
 use plibv4\process\TaskEnvelope;
 use plibv4\process\TimeshareObservers;
 class RoundRobinTest extends TestCase {
-	function testConstruct() {
+	function testConstruct(): void {
 		$rr = new RoundRobin();
 		$this->assertInstanceOf(RoundRobin::class, $rr);
 		$this->assertSame(null, TestHelper::getPropertyValue($rr, "pointer"));
 	}
 	
-	function testAdd() {
+	function testAdd(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -29,7 +29,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count, TestHelper::getPropertyValue($rr, "tasks"));
 	}
 	
-	function testGetCount() {
+	function testGetCount(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -47,7 +47,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame(3, $rr->getCount());
 	}
 	
-	function testGetFirstCurrent() {
+	function testGetFirstCurrent(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -62,7 +62,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count0, $rr->getCurrent());
 	}
 
-	function testIncrement() {
+	function testIncrement(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -85,7 +85,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count2, $rr->getCurrent());
 	}
 
-	function testGetCurrentIncrement() {
+	function testGetCurrentIncrement(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -113,7 +113,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count1, $rr->getCurrentIncrement());
 	}
 	
-	function testRemovePointerZeroElementZero() {
+	function testRemovePointerZeroElementZero(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -155,7 +155,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame(0, $rr->getCount());
 	}
 	
-	function testRemoveElementBeforePointer() {
+	function testRemoveElementBeforePointer(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -179,7 +179,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count3, $rr->getCurrent());
 	}
 	
-	function testRemoveElementAfterPointer() {
+	function testRemoveElementAfterPointer(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -202,7 +202,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count2, $rr->getCurrent());
 	}
 	
-	function testRemoveElementEqualsPointer() {
+	function testRemoveElementEqualsPointer(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -225,7 +225,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count3, $rr->getCurrent());
 	}
 
-	function testRemoveLastElementHighestPointer() {
+	function testRemoveLastElementHighestPointer(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -250,7 +250,7 @@ class RoundRobinTest extends TestCase {
 		$this->assertSame($count0, $rr->getCurrent());
 	}
 	
-	function testIterate() {
+	function testIterate(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();

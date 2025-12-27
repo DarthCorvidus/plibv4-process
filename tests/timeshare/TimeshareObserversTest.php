@@ -7,7 +7,7 @@ use plibv4\process\Scheduler;
 use plibv4\process\TimeshareObserver;
 use plibv4\process\TimeshareObservers;
 class TimeshareObserversTest extends TestCase {
-	public function testAddObserver() {
+	public function testAddObserver(): void {
 		$timeshare = new TimeshareObservers();
 		$timeshare->addTimeshareObserver(new TrackObserver());
 		
@@ -17,7 +17,7 @@ class TimeshareObserversTest extends TestCase {
 		$this->assertSame(1, count($name->getValue($timeshare)));
 	}
 
-	public function testAddDuplicate() {
+	public function testAddDuplicate(): void {
 		$timeshare = new TimeshareObservers();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -29,7 +29,7 @@ class TimeshareObserversTest extends TestCase {
 		$this->assertSame(1, count($name->getValue($timeshare)));
 	}
 	
-	function testOnAdd() {
+	function testOnAdd(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 
@@ -41,7 +41,7 @@ class TimeshareObserversTest extends TestCase {
 		$to->onAddCalled($timeshare, $count, 1);
 	}
 	
-	function testOnStart() {
+	function testOnStart(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 
@@ -53,7 +53,7 @@ class TimeshareObserversTest extends TestCase {
 		$to->onStartCalled($timeshare, $count, 1);
 	}
 
-	function testOnRemove() {
+	function testOnRemove(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 
@@ -65,7 +65,7 @@ class TimeshareObserversTest extends TestCase {
 		$to->onRemoveCalled($timeshare, $count, Scheduler::FINISH, 1);
 	}
 
-	function testOnPause() {
+	function testOnPause(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 
@@ -77,7 +77,7 @@ class TimeshareObserversTest extends TestCase {
 		$to->onPauseCalled($timeshare, $count, 1);
 	}
 
-	function testOnResume() {
+	function testOnResume(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 
@@ -89,7 +89,7 @@ class TimeshareObserversTest extends TestCase {
 		$to->onResumeCalled($timeshare, $count, 1);
 	}
 
-	function testOnError() {
+	function testOnError(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 

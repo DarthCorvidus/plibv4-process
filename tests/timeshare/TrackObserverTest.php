@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
 use plibv4\process\Scheduler;
 class TrackObserverTest extends TestCase {
-	function testOnAdd() {
+	function testOnAdd(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
@@ -57,7 +57,7 @@ class TrackObserverTest extends TestCase {
 		$to->onErrorNotCalled();
 	}
 	
-	function testOnRemove() {
+	function testOnRemove(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
@@ -101,7 +101,7 @@ class TrackObserverTest extends TestCase {
 		$to->onAddNotCalled();
 	}
 	
-	function testOnError() {
+	function testOnError(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
@@ -145,7 +145,7 @@ class TrackObserverTest extends TestCase {
 		$to->onErrorCalled($timeshare, $count02, $ex02, Scheduler::START, 2);
 	}
 	
-	function testOnStart() {
+	function testOnStart(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
@@ -187,7 +187,7 @@ class TrackObserverTest extends TestCase {
 		$to->onStartCalled($timeshare, $count02, 2);
 	}
 
-	function testOnPause() {
+	function testOnPause(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
@@ -229,7 +229,7 @@ class TrackObserverTest extends TestCase {
 		$to->onPauseCalled($timeshare, $count02, 2);
 	}
 
-	function testOnResume() {
+	function testOnResume(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);

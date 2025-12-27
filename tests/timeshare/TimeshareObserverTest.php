@@ -18,7 +18,7 @@ class TimeshareObserverTest extends TestCase {
 	private ?Task $lastError = null;
 	private ?\Exception $lastException = null;
 
-	public function testOnAdd() {
+	public function testOnAdd(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -32,7 +32,7 @@ class TimeshareObserverTest extends TestCase {
 		$to->onAddCalled($timeshare, $count02, 2);
 	}
 
-	public function testOnStart() {
+	public function testOnStart(): void {
 		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
@@ -56,7 +56,7 @@ class TimeshareObserverTest extends TestCase {
 	}
 	
 
-	public function testOnRemoveFinished() {
+	public function testOnRemoveFinished(): void {
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
 		$timeshare->addTimeshareObserver($to);
@@ -70,7 +70,7 @@ class TimeshareObserverTest extends TestCase {
 		$to->onRemoveCalled($timeshare, $count02, Scheduler::FINISH, 2);
 	}
 	
-	public function testOnRemoveTerminated() {
+	public function testOnRemoveTerminated(): void {
 		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
@@ -90,7 +90,7 @@ class TimeshareObserverTest extends TestCase {
 		$to->onRemoveCalled($timeshare, $count01, Scheduler::TERMINATE, 2);
 	}
 
-	public function testOnErrorStart() {
+	public function testOnErrorStart(): void {
 		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
@@ -111,7 +111,7 @@ class TimeshareObserverTest extends TestCase {
 		$this->assertSame(0, $count02->getCount());
 	}
 
-	public function testOnErrorLoop() {
+	public function testOnErrorLoop(): void {
 		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();
@@ -137,7 +137,7 @@ class TimeshareObserverTest extends TestCase {
 
 	}
 	
-	public function testOnErrorFinish() {
+	public function testOnErrorFinish(): void {
 		$parent = new Timeshare();
 		$timeshare = new Timeshare();
 		$to = new TrackObserver();

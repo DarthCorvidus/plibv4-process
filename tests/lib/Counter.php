@@ -20,7 +20,7 @@ class Counter implements plibv4\process\Task {
 		$this->modulo = $modulo;
 	}
 	
-	function exceptionOn(int $i) {
+	function exceptionOn(int $i): void {
 		$this->exceptionOn = $i;
 	}
 	
