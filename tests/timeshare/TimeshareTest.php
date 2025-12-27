@@ -3,7 +3,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
 use plibv4\process\Scheduler;
-class TimeshareTest extends TestCase {
+final class TimeshareTest extends TestCase {
 	function testConstruct(): void {
 		$construct = new plibv4\process\Timeshare();
 		$this->assertInstanceOf(\plibv4\process\Scheduler::class, $construct);

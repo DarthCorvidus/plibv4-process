@@ -1,6 +1,6 @@
 <?php
 use plibv4\process\Scheduler;
-class Counter implements plibv4\process\Task {
+final class Counter implements plibv4\process\Task {
 	private int $max = 0;
 	private int $count = 0;
 	public int $terminated = 0;

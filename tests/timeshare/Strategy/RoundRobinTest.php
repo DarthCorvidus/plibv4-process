@@ -6,7 +6,7 @@ use plibv4\process\Task;
 use \plibv4\process\RoundRobin;
 use plibv4\process\TaskEnvelope;
 use plibv4\process\TimeshareObservers;
-class RoundRobinTest extends TestCase {
+final class RoundRobinTest extends TestCase {
 	function testConstruct(): void {
 		$rr = new RoundRobin();
 		$this->assertInstanceOf(RoundRobin::class, $rr);

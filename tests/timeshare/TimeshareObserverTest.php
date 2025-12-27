@@ -5,7 +5,7 @@ use plibv4\process\Timeshare;
 use plibv4\process\Task;
 use plibv4\process\TimeshareObserver;
 use plibv4\process\Scheduler;
-class TimeshareObserverTest extends TestCase {
+final class TimeshareObserverTest extends TestCase {
 	private int $addCount = 0;
 	private int $lastStatus = 0;
 	private int $removeCount = 0;

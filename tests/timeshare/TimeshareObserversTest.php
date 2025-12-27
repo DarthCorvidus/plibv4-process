@@ -6,7 +6,7 @@ use plibv4\process\Task;
 use plibv4\process\Scheduler;
 use plibv4\process\TimeshareObserver;
 use plibv4\process\TimeshareObservers;
-class TimeshareObserversTest extends TestCase {
+final class TimeshareObserversTest extends TestCase {
 	public function testAddObserver(): void {
 		$timeshare = new TimeshareObservers();
 		$timeshare->addTimeshareObserver(new TrackObserver());

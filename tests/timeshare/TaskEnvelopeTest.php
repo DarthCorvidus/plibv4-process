@@ -7,7 +7,7 @@ use plibv4\process\TaskEnvelope;
 use plibv4\process\Timeshare;
 use plibv4\process\Scheduler;
 use plibv4\process\Task;
-class TaskEnvelopeTest extends TestCase {
+final class TaskEnvelopeTest extends TestCase {
 	function testConstruct(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();

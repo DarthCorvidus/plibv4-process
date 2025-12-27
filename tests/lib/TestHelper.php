@@ -1,6 +1,6 @@
 <?php
 use plibv4\process\RoundRobin;
-class TestHelper {
+final class TestHelper {
 	static function invoke($object, $methodName, array $args) {
 		$reflector = new ReflectionClass(get_class($object));
 		$method = $reflector->getMethod($methodName);

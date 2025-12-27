@@ -2,7 +2,7 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
-class CounterTest extends TestCase {
+final class CounterTest extends TestCase {
 	function testCounter(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500);

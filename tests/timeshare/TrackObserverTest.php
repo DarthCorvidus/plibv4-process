@@ -3,7 +3,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
 use plibv4\process\Scheduler;
-class TrackObserverTest extends TestCase {
+final class TrackObserverTest extends TestCase {
 	function testOnAdd(): void {
 		$to = new TrackObserver();
 		$timeshare = new Timeshare();

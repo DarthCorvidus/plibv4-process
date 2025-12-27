@@ -3,7 +3,7 @@ use plibv4\process\TimeshareObserver;
 use plibv4\process\Scheduler;
 use plibv4\process\Task;
 use PHPUnit\Framework\TestCase;
-class TrackObserver implements TimeshareObserver {
+final class TrackObserver implements TimeshareObserver {
 	public int $countAdded = 0;
 	public int $countRemoved = 0;
 	public int $countError = 0;

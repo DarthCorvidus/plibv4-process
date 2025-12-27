@@ -1,6 +1,6 @@
 <?php
 use plibv4\process\Scheduler;
-class Stubborn implements \plibv4\process\Task {
+final class Stubborn implements \plibv4\process\Task {
 	#[\Override]
 	public function __tsFinish(Scheduler $sched): void {
 		
