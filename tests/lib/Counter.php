@@ -9,6 +9,13 @@ final class Counter implements plibv4\process\Task {
 	private int $modulo = 1;
 	private int $exceptionOn = 0;
 	public int $exceptionThrown = 0;
+	/**
+	 * If we do it properly, (?Exception, null), Psalm throws
+	 * PossiblyNullArgument & PossiblyNullReference. It does not get the whole
+	 * point of testing. Strangely enough, it accepts acessing a possibly
+	 * undefined variable
+	 * @psalm-suppress PropertyNotSetInConstructor
+	 */
 	public Exception $exceptionReceived;
 	public int $exceptionStep = 0;
 	public bool $exceptionStart = false;
