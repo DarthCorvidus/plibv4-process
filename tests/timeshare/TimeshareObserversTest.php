@@ -11,10 +11,7 @@ final class TimeshareObserversTest extends TestCase {
 		$timeshare = new TimeshareObservers();
 		$timeshare->addTimeshareObserver(new TrackObserver());
 		
-		$reflection = new ReflectionClass($timeshare);
-		$name = $reflection->getProperty("timeshareObservers");
-		$name->setAccessible(true);
-		$this->assertSame(1, count($name->getValue($timeshare)));
+		$this->assertSame(1, $timeshare->getCount());
 	}
 
 	public function testAddDuplicate(): void {
@@ -23,10 +20,7 @@ final class TimeshareObserversTest extends TestCase {
 		$timeshare->addTimeshareObserver($to);
 		$timeshare->addTimeshareObserver($to);
 	
-		$reflection = new ReflectionClass($timeshare);
-		$name = $reflection->getProperty("timeshareObservers");
-		$name->setAccessible(true);
-		$this->assertSame(1, count($name->getValue($timeshare)));
+		$this->assertSame(1, $timeshare->getCount());
 	}
 	
 	function testOnAdd(): void {

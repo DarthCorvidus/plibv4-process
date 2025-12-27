@@ -9,6 +9,10 @@ class TimeshareObservers {
 		}
 		$this->timeshareObservers[] = $observer;
 	}
+	
+	function getCount(): int {
+		return count($this->timeshareObservers);
+	}
 
 	function onAdd(Scheduler $scheduler, Task $task): void {
 		foreach($this->timeshareObservers as $value) {
