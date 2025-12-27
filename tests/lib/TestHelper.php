@@ -1,14 +1,14 @@
 <?php
 use plibv4\process\RoundRobin;
 final class TestHelper {
-	static function invoke($object, $methodName, array $args) {
+	static function invoke(Object $object, string $methodName, array $args): mixed {
 		$reflector = new ReflectionClass(get_class($object));
 		$method = $reflector->getMethod($methodName);
 		$method->setAccessible(true);
 	return $method->invokeArgs($object, $args);
 	}
 	
-	static function getPropertyValue(RoundRobin $object, string $propertyName) {
+	static function getPropertyValue(Object $object, string $propertyName): mixed {
 		$reflector = new ReflectionObject($object);
 		$property = $reflector->getProperty($propertyName);
 	return $property->getValue($object);
