@@ -30,6 +30,7 @@ class TrackObserver implements TimeshareObserver {
 		throw new \Exception("expected value does not match supplied value");
 	}
 
+	#[\Override]
 	public function onAdd(Scheduler $scheduler, Task $task): void {
 		$this->countAdded++;
 		$this->lastSchedule = $scheduler;
@@ -47,6 +48,7 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(null, $this->lastTaskAdded);
 	}
 
+	#[\Override]
 	public function onError(Scheduler $scheduler, Task $task, \Exception $e, int $step): void {
 		$this->countError++;
 		$this->lastSchedule = $scheduler;
@@ -70,6 +72,7 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(0, $this->lastStepError);
 	}
 
+	#[\Override]
 	public function onRemove(Scheduler $scheduler, Task $task, int $step): void {
 		$this->countRemoved++;
 		$this->lastSchedule = $scheduler;
@@ -90,6 +93,7 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(0, $this->lastStepRemoved);
 	}
 
+	#[\Override]
 	public function onStart(Scheduler $scheduler, Task $task): void {
 		$this->countStarted++;
 		$this->lastSchedule = $scheduler;
@@ -107,6 +111,7 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(null, $this->lastTaskStarted);
 	}
 	
+	#[\Override]
 	public function onPause(Scheduler $scheduler, Task $task): void {
 		$this->countPaused++;
 		$this->lastSchedule = $scheduler;
@@ -124,6 +129,7 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(null, $this->lastTaskPaused);
 	}
 	
+	#[\Override]
 	public function onResume(Scheduler $scheduler, Task $task): void {
 		$this->countResumed++;
 		$this->lastSchedule = $scheduler;

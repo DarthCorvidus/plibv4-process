@@ -28,6 +28,7 @@ class Counter implements plibv4\process\Task {
 		return $this->count;
 	}
 
+	#[\Override]
 	public function __tsFinish(Scheduler $sched): void {
 		if($this->exceptionFinish) {
 			$this->exceptionThrown++;
@@ -36,10 +37,12 @@ class Counter implements plibv4\process\Task {
 		$this->finished++;
 	}
 
+	#[\Override]
 	public function __tsKill(Scheduler $sched): void {
 		
 	}
 
+	#[\Override]
 	public function __tsLoop(Scheduler $sched): bool {
 		$this->count++;
 		if($this->count == $this->exceptionOn) {
@@ -49,6 +52,7 @@ class Counter implements plibv4\process\Task {
 	return $this->count < $this->max;
 	}
 
+	#[\Override]
 	public function __tsPause(Scheduler $sched): void {
 		if($this->exceptionPause) {
 			$this->exceptionThrown++;
@@ -56,6 +60,7 @@ class Counter implements plibv4\process\Task {
 		}
 	}
 
+	#[\Override]
 	public function __tsResume(Scheduler $sched): void {
 		if($this->exceptionResume) {
 			$this->exceptionThrown++;
@@ -63,6 +68,7 @@ class Counter implements plibv4\process\Task {
 		}
 	}
 
+	#[\Override]
 	public function __tsStart(Scheduler $sched): void {
 		if($this->exceptionStart) {
 			$this->exceptionThrown++;
@@ -71,11 +77,13 @@ class Counter implements plibv4\process\Task {
 		$this->started++;
 	}
 
+	#[\Override]
 	public function __tsTerminate(Scheduler $sched): bool {
 		$this->terminated++;
 		return $this->count % $this->modulo == 0;
 	}
 	
+	#[\Override]
 	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
 		$this->exceptionReceived = $e;
 		$this->exceptionStep = $step;
