@@ -15,10 +15,32 @@
 				<directory name="src" />
 			</errorLevel>
 		</ClassMustBeFinal>
+		<!--
+		The purpose of TrackObserver is to track how often test methods were
+		called; part of the tests are to check that the wrong observer method
+		has not called as well. Psalm is not able to understand it.
+		-->
+		<RedundantConditionGivenDocblockType>
+			<errorLevel type="suppress">
+				<file name="tests/timeshare/TrackObserverTest.php" />
+				<file name="tests/timeshare/TimeshareTest.php" />
+				<file name="tests/timeshare/TaskEnvelopeTest.php" />
+				<file name="tests/timeshare/TimeshareObserverTest.php" />
+			</errorLevel>
+		</RedundantConditionGivenDocblockType>
+		<DocblockTypeContradiction>
+			<errorLevel type="suppress">
+				<file name="tests/timeshare/TrackObserverTest.php" />
+				<file name="tests/timeshare/TimeshareTest.php" />
+				<file name="tests/timeshare/TaskEnvelopeTest.php" />
+				<file name="tests/timeshare/CounterTest.php" />
+			</errorLevel>
+		</DocblockTypeContradiction>
 	</issueHandlers>
 		
 	<projectFiles>
         <directory name="src" />
+		<directory name="tests" />
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>

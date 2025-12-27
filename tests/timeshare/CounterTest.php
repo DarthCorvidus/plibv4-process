@@ -2,8 +2,8 @@
 declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use plibv4\process\Timeshare;
-class CounterTest extends TestCase {
-	function testCounter() {
+final class CounterTest extends TestCase {
+	function testCounter(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500);
 		while($counter->__tsLoop($timeshare)) {
@@ -13,7 +13,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(0, $counter->terminated);
 	}
 	
-	function testStart() {
+	function testStart(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500);
 		$this->assertSame(0, $counter->started);
@@ -21,7 +21,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(1, $counter->started);
 	}
 
-	function testFinish() {
+	function testFinish(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500);
 		$this->assertSame(0, $counter->finished);
@@ -29,7 +29,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(1, $counter->finished);
 	}
 	
-	function testTerminate() {
+	function testTerminate(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500);
 		$i = 0;
@@ -43,7 +43,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(1, $counter->terminated);
 	}
 	
-	function testTerminateModulo() {
+	function testTerminateModulo(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(500, 100);
 		$i = 0;
@@ -60,7 +60,7 @@ class CounterTest extends TestCase {
 	/**
 	 * Edge case: the max value has precedence over the next mod 100 value.
 	 */
-	function testTerminateEdgeCase() {
+	function testTerminateEdgeCase(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$i = 0;
@@ -75,7 +75,7 @@ class CounterTest extends TestCase {
 		$this->assertSame(5, $counter->terminated);
 	}
 
-	function testExceptionLoop() {
+	function testExceptionLoop(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$counter->exceptionOn(10);
@@ -87,7 +87,7 @@ class CounterTest extends TestCase {
 		$counter->__tsLoop($timeshare);
 	}
 	
-	function testExceptionStart() {
+	function testExceptionStart(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$counter->exceptionStart = true;
@@ -96,7 +96,7 @@ class CounterTest extends TestCase {
 		$counter->__tsStart($timeshare);
 	}
 
-	function testExceptionFinish() {
+	function testExceptionFinish(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$counter->exceptionFinish = true;
@@ -105,7 +105,7 @@ class CounterTest extends TestCase {
 		$counter->__tsFinish($timeshare);
 	}
 
-	function testExceptionPause() {
+	function testExceptionPause(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$counter->exceptionPause = true;
@@ -114,7 +114,7 @@ class CounterTest extends TestCase {
 		$counter->__tsPause($timeshare);
 	}
 	
-	function testExceptionResume() {
+	function testExceptionResume(): void {
 		$timeshare = new Timeshare();
 		$counter = new Counter(250, 100);
 		$counter->exceptionResume = true;

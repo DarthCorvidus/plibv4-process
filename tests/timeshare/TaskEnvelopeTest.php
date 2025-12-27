@@ -7,8 +7,8 @@ use plibv4\process\TaskEnvelope;
 use plibv4\process\Timeshare;
 use plibv4\process\Scheduler;
 use plibv4\process\Task;
-class TaskEnvelopeTest extends TestCase {
-	function testConstruct() {
+final class TaskEnvelopeTest extends TestCase {
+	function testConstruct(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -19,7 +19,7 @@ class TaskEnvelopeTest extends TestCase {
 		$to->onStartNotCalled();
 	}
 	
-	function testStart() {
+	function testStart(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -31,7 +31,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(0, $task->getCount());
 	}
 
-	function testStartError() {
+	function testStartError(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -44,7 +44,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(0, $task->getCount());
 	}
 	
-	function testLoopFirst() {
+	function testLoopFirst(): void {
 		$observers = new TimeshareObservers();
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
@@ -55,7 +55,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(1, $task->getCount());
 	}
 
-	function testLoopRun() {
+	function testLoopRun(): void {
 		$observers = new TimeshareObservers();
 		$scheduler = new Timeshare();
 		$task = new Counter(20);
@@ -72,7 +72,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(20, $task->getCount());
 	}
 
-	function testLoopError() {
+	function testLoopError(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -88,7 +88,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(15, $task->getCount());
 	}
 	
-	function testPause() {
+	function testPause(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -107,7 +107,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(10, $task->getCount());
 	}
 	
-	function testPauseError() {
+	function testPauseError(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -122,7 +122,7 @@ class TaskEnvelopeTest extends TestCase {
 		$to->onErrorCalled($scheduler, $task, $task->exceptionReceived, Scheduler::PAUSE, 1);
 	}
 
-	function testResume() {
+	function testResume(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);
@@ -141,7 +141,7 @@ class TaskEnvelopeTest extends TestCase {
 		$this->assertSame(20, $task->getCount());
 	}
 	
-	function testResumeError() {
+	function testResumeError(): void {
 		$observers = new TimeshareObservers();
 		$to = new TrackObserver();
 		$observers->addTimeshareObserver($to);

@@ -3,7 +3,7 @@ use plibv4\process\TimeshareObserver;
 use plibv4\process\Scheduler;
 use plibv4\process\Task;
 use PHPUnit\Framework\TestCase;
-class TrackObserver implements TimeshareObserver {
+final class TrackObserver implements TimeshareObserver {
 	public int $countAdded = 0;
 	public int $countRemoved = 0;
 	public int $countError = 0;
@@ -20,33 +20,25 @@ class TrackObserver implements TimeshareObserver {
 	public ?\Exception $lastException = null;
 	public int $lastStepError = 0;
 	public int $lastStepRemoved = 0;
-	public function assertSame(mixed $expected, mixed $given): bool {
-		if($expected === $given) {
-			return true;
-		}
-		if(is_scalar($expected) && is_scalar($given)) {
-			throw new \Exception("expected value ".$expected." does not match actual ".$given." value");
-		}
-		throw new \Exception("expected value does not match supplied value");
-	}
-
+	#[\Override]
 	public function onAdd(Scheduler $scheduler, Task $task): void {
 		$this->countAdded++;
 		$this->lastSchedule = $scheduler;
 		$this->lastTaskAdded = $task;
 	}
 
-	public function onAddCalled(Scheduler $scheduler, Task $task, int $count) {
+	public function onAddCalled(Scheduler $scheduler, Task $task, int $count): void {
 		TestCase::assertSame($count, $this->countAdded);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskAdded);
 	}
 
-	public function onAddNotCalled() {
+	public function onAddNotCalled(): void {
 		TestCase::assertSame(0, $this->countAdded);
 		TestCase::assertSame(null, $this->lastTaskAdded);
 	}
 
+	#[\Override]
 	public function onError(Scheduler $scheduler, Task $task, \Exception $e, int $step): void {
 		$this->countError++;
 		$this->lastSchedule = $scheduler;
@@ -55,7 +47,7 @@ class TrackObserver implements TimeshareObserver {
 		$this->lastStepError = $step;
 	}
 	
-	public function onErrorCalled(Scheduler $scheduler, Task $task, \Exception $e, int $step, int $count) {
+	public function onErrorCalled(Scheduler $scheduler, Task $task, \Exception $e, int $step, int $count): void {
 		TestCase::assertSame($count, $this->countError);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskError);
@@ -63,13 +55,14 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame($step, $this->lastStepError);
 	}
 
-	public function onErrorNotCalled() {
+	public function onErrorNotCalled(): void {
 		TestCase::assertSame(0, $this->countError);
 		TestCase::assertSame(null, $this->lastTaskError);
 		TestCase::assertSame(null, $this->lastException);
 		TestCase::assertSame(0, $this->lastStepError);
 	}
 
+	#[\Override]
 	public function onRemove(Scheduler $scheduler, Task $task, int $step): void {
 		$this->countRemoved++;
 		$this->lastSchedule = $scheduler;
@@ -90,13 +83,14 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(0, $this->lastStepRemoved);
 	}
 
+	#[\Override]
 	public function onStart(Scheduler $scheduler, Task $task): void {
 		$this->countStarted++;
 		$this->lastSchedule = $scheduler;
 		$this->lastTaskStarted = $task;
 	}
 
-	public function onStartCalled(Scheduler $scheduler, Task $task, int $count) {
+	public function onStartCalled(Scheduler $scheduler, Task $task, int $count): void {
 		TestCase::assertSame($count, $this->countStarted);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskStarted);
@@ -107,36 +101,38 @@ class TrackObserver implements TimeshareObserver {
 		TestCase::assertSame(null, $this->lastTaskStarted);
 	}
 	
+	#[\Override]
 	public function onPause(Scheduler $scheduler, Task $task): void {
 		$this->countPaused++;
 		$this->lastSchedule = $scheduler;
 		$this->lastTaskPaused = $task;
 	}
 
-	public function onPauseCalled(Scheduler $scheduler, Task $task, int $count) {
+	public function onPauseCalled(Scheduler $scheduler, Task $task, int $count): void {
 		TestCase::assertSame($count, $this->countPaused);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskPaused);
 	}
 
-	public function onPauseNotCalled() {
+	public function onPauseNotCalled(): void {
 		TestCase::assertSame(0, $this->countPaused);
 		TestCase::assertSame(null, $this->lastTaskPaused);
 	}
 	
+	#[\Override]
 	public function onResume(Scheduler $scheduler, Task $task): void {
 		$this->countResumed++;
 		$this->lastSchedule = $scheduler;
 		$this->lastTaskResumed = $task;
 	}
 
-	public function onResumeCalled(Scheduler $scheduler, Task $task, int $count) {
+	public function onResumeCalled(Scheduler $scheduler, Task $task, int $count): void {
 		TestCase::assertSame($count, $this->countResumed);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskResumed);
 	}
 
-	public function onResumeNotCalled() {
+	public function onResumeNotCalled(): void {
 		TestCase::assertSame(0, $this->countResumed);
 		TestCase::assertSame(null, $this->lastTaskResumed);
 	}
