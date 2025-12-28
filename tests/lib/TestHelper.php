@@ -1,5 +1,7 @@
 <?php
-use plibv4\process\RoundRobin;
+namespace plibv4\process;
+use ReflectionClass;
+use ReflectionObject;
 final class TestHelper {
 	static function invoke(Object $object, string $methodName, array $args): mixed {
 		$reflector = new ReflectionClass(get_class($object));

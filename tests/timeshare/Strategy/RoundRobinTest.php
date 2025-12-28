@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\Timeshare;
-use plibv4\process\Task;
-use \plibv4\process\RoundRobin;
-use plibv4\process\TaskEnvelope;
-use plibv4\process\TimeshareObservers;
 final class RoundRobinTest extends TestCase {
 	function testConstruct(): void {
 		$rr = new RoundRobin();

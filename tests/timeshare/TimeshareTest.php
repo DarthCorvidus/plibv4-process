@@ -1,16 +1,17 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\Timeshare;
-use plibv4\process\Scheduler;
+use Exception;
+use RuntimeException;
 final class TimeshareTest extends TestCase {
 	function testConstruct(): void {
-		$construct = new plibv4\process\Timeshare();
-		$this->assertInstanceOf(\plibv4\process\Scheduler::class, $construct);
+		$construct = new Timeshare();
+		$this->assertInstanceOf(Scheduler::class, $construct);
 	}
 	
 	function testGetCountZero(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$this->assertSame(0, $timeshare->getTaskCount());
 	}
 	
@@ -33,7 +34,7 @@ final class TimeshareTest extends TestCase {
 	}
 	
 	function testGetCountAdded(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count = new Counter(500);
 		$timeshare->addTask($count);
 		$this->assertSame(1, $timeshare->getTaskCount());
@@ -44,7 +45,7 @@ final class TimeshareTest extends TestCase {
 	
 	function testStartProcess(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(500);
 		$timeshare->addTask($count01);
@@ -63,7 +64,7 @@ final class TimeshareTest extends TestCase {
 	 */
 	function testLoop(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000, 100);
 		$timeshare->addTask($count01);
@@ -105,7 +106,7 @@ final class TimeshareTest extends TestCase {
 	 * Run executes until loop() of every Task instance returns false.
 	 */
 	function testRun(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000);
 		$timeshare->addTask($count01);
@@ -127,7 +128,7 @@ final class TimeshareTest extends TestCase {
 	
 	function testTerminateAll(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000);
 		$timeshare->addTask($count01);
@@ -155,7 +156,7 @@ final class TimeshareTest extends TestCase {
 
 	function testDeferredTerminateAll(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count01 = new Counter(500);
 		$count02 = new Counter(1000, 100);
 		$timeshare->addTask($count01);
@@ -183,7 +184,7 @@ final class TimeshareTest extends TestCase {
 
 	function testTimeoutSeconds(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$timeshare->addTask(new Stubborn());
 		$timeshare->setTimeout(1, 0);
 		
@@ -198,7 +199,7 @@ final class TimeshareTest extends TestCase {
 	
 	function testTimeoutMicroeconds(): void {
 		$parent = new Timeshare();
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$timeshare->addTask(new Stubborn());
 		$timeshare->setTimeout(0, 500000);
 		$i = 0;
@@ -212,7 +213,7 @@ final class TimeshareTest extends TestCase {
 	}
 	
 	function testErrorStart(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count = new Counter(10);
 		$count->exceptionStart = true;
 		$timeshare->addTask($count);
@@ -224,7 +225,7 @@ final class TimeshareTest extends TestCase {
 	}
 	
 	function testErrorLoop(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count = new Counter(100);
 		$count->exceptionOn(10);
 		$timeshare->addTask($count);
@@ -236,13 +237,13 @@ final class TimeshareTest extends TestCase {
 	}
 
 	function testErrorFinish(): void {
-		$timeshare = new plibv4\process\Timeshare();
+		$timeshare = new Timeshare();
 		$count = new Counter(100);
 		$count->exceptionFinish = true;
 		$timeshare->addTask($count);
 		$timeshare->run();
 		$this->assertSame(1, $count->exceptionThrown);
-		$this->assertSame(\plibv4\process\Scheduler::FINISH, $count->exceptionStep);
+		$this->assertSame(Scheduler::FINISH, $count->exceptionStep);
 		$this->assertSame("exception at finish.", $count->exceptionReceived->getMessage());
 		$this->assertSame(0, $count->finished);
 	}
@@ -320,8 +321,8 @@ final class TimeshareTest extends TestCase {
 		$timeshare->addTask($count01);
 		$timeshare->addTask($count02);
 		$timeshare->__tsLoop($parent);
-		$this->expectException(\RuntimeException::class);
-		$this->expectExceptionMessage("Task 'Counter' not found in Scheduler 'plibv4\process\Timeshare'");
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("Task '".Counter::class."' not found in Scheduler '".Timeshare::class."'");
 		$timeshare->kill($count03);
 	}
 	

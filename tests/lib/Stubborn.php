@@ -1,6 +1,7 @@
 <?php
-use plibv4\process\Scheduler;
-final class Stubborn implements \plibv4\process\Task {
+namespace plibv4\process;
+use Exception;
+final class Stubborn implements Task {
 	#[\Override]
 	public function __tsFinish(Scheduler $sched): void {
 		
@@ -37,7 +38,7 @@ final class Stubborn implements \plibv4\process\Task {
 	}
 	
 	#[\Override]
-	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
+	public function __tsError(Scheduler $sched, Exception $e, int $step): void {
 		;
 	}
 }

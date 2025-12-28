@@ -1,11 +1,8 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\Timeshare;
-use plibv4\process\Task;
-use plibv4\process\Scheduler;
-use plibv4\process\TimeshareObserver;
-use plibv4\process\TimeshareObservers;
+use Exception;
 final class TimeshareObserversTest extends TestCase {
 	public function testAddObserver(): void {
 		$timeshare = new TimeshareObservers();
@@ -90,7 +87,7 @@ final class TimeshareObserversTest extends TestCase {
 		$obs = new TimeshareObservers();
 		$obs->addTimeshareObserver($to);
 		$count = new Counter(15);
-		$ex = new \Exception("test");
+		$ex = new Exception("test");
 		
 		$obs->onError($timeshare, $count, $ex, Scheduler::FINISH);
 		$to->onErrorCalled($timeshare, $count, $ex, Scheduler::FINISH, 1);

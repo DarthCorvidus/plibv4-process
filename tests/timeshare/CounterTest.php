@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\Timeshare;
+use RuntimeException;
 final class CounterTest extends TestCase {
 	function testCounter(): void {
 		$timeshare = new Timeshare();

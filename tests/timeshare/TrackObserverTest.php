@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\Timeshare;
-use plibv4\process\Scheduler;
+use RuntimeException;
 final class TrackObserverTest extends TestCase {
 	function testOnAdd(): void {
 		$to = new TrackObserver();
@@ -106,8 +106,8 @@ final class TrackObserverTest extends TestCase {
 		$timeshare = new Timeshare();
 		$count01 = new Counter(25);
 		$count02 = new Counter(30);
-		$ex01 = new \RuntimeException();
-		$ex02 = new \RuntimeException();
+		$ex01 = new RuntimeException();
+		$ex02 = new RuntimeException();
 		$to->onError($timeshare, $count01, $ex01, Scheduler::FINISH);
 		$this->assertSame(0, $to->countAdded);
 		$this->assertSame(0, $to->countRemoved);

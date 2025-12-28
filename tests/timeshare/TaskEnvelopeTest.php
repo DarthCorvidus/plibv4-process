@@ -1,12 +1,7 @@
 <?php
 declare(strict_types=1);
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
-use plibv4\process\TimeshareObservers;
-use plibv4\process\TimeshareObserver;
-use plibv4\process\TaskEnvelope;
-use plibv4\process\Timeshare;
-use plibv4\process\Scheduler;
-use plibv4\process\Task;
 final class TaskEnvelopeTest extends TestCase {
 	function testConstruct(): void {
 		$observers = new TimeshareObservers();

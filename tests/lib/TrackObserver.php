@@ -1,8 +1,7 @@
 <?php
-use plibv4\process\TimeshareObserver;
-use plibv4\process\Scheduler;
-use plibv4\process\Task;
+namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
+use Exception;
 final class TrackObserver implements TimeshareObserver {
 	public int $countAdded = 0;
 	public int $countRemoved = 0;
@@ -39,7 +38,7 @@ final class TrackObserver implements TimeshareObserver {
 	}
 
 	#[\Override]
-	public function onError(Scheduler $scheduler, Task $task, \Exception $e, int $step): void {
+	public function onError(Scheduler $scheduler, Task $task, Exception $e, int $step): void {
 		$this->countError++;
 		$this->lastSchedule = $scheduler;
 		$this->lastTaskError = $task;
@@ -47,7 +46,7 @@ final class TrackObserver implements TimeshareObserver {
 		$this->lastStepError = $step;
 	}
 	
-	public function onErrorCalled(Scheduler $scheduler, Task $task, \Exception $e, int $step, int $count): void {
+	public function onErrorCalled(Scheduler $scheduler, Task $task, Exception $e, int $step, int $count): void {
 		TestCase::assertSame($count, $this->countError);
 		TestCase::assertSame($scheduler, $this->lastSchedule);
 		TestCase::assertSame($task, $this->lastTaskError);

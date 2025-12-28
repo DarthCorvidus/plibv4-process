@@ -1,6 +1,8 @@
 <?php
-use plibv4\process\Scheduler;
-final class Counter implements plibv4\process\Task {
+namespace plibv4\process;
+use Exception;
+use RuntimeException;
+final class Counter implements Task {
 	private int $max = 0;
 	private int $count = 0;
 	public int $terminated = 0;
@@ -39,7 +41,7 @@ final class Counter implements plibv4\process\Task {
 	public function __tsFinish(Scheduler $sched): void {
 		if($this->exceptionFinish) {
 			$this->exceptionThrown++;
-			throw new \RuntimeException("exception at finish.");
+			throw new RuntimeException("exception at finish.");
 		}
 		$this->finished++;
 	}
@@ -63,7 +65,7 @@ final class Counter implements plibv4\process\Task {
 	public function __tsPause(Scheduler $sched): void {
 		if($this->exceptionPause) {
 			$this->exceptionThrown++;
-			throw new \RuntimeException("exception at pause.");
+			throw new RuntimeException("exception at pause.");
 		}
 	}
 
@@ -71,7 +73,7 @@ final class Counter implements plibv4\process\Task {
 	public function __tsResume(Scheduler $sched): void {
 		if($this->exceptionResume) {
 			$this->exceptionThrown++;
-			throw new \RuntimeException("exception at resume.");
+			throw new RuntimeException("exception at resume.");
 		}
 	}
 
@@ -79,7 +81,7 @@ final class Counter implements plibv4\process\Task {
 	public function __tsStart(Scheduler $sched): void {
 		if($this->exceptionStart) {
 			$this->exceptionThrown++;
-			throw new \RuntimeException("exception at start");
+			throw new RuntimeException("exception at start");
 		}
 		$this->started++;
 	}
@@ -91,7 +93,7 @@ final class Counter implements plibv4\process\Task {
 	}
 	
 	#[\Override]
-	public function __tsError(Scheduler $sched, \Exception $e, int $step): void {
+	public function __tsError(Scheduler $sched, Exception $e, int $step): void {
 		$this->exceptionReceived = $e;
 		$this->exceptionStep = $step;
 	}
