@@ -69,13 +69,18 @@ class RoundRobin implements Strategy {
 			throw new \RuntimeException("no tasks in queue");
 		}
 		$new = array();
+		$inQueue = false;
 		foreach($this->tasks as $key => $value) {
 			if($value === $task) {
 				$this->modifyPointer($key);
 				$this->count--;
+				$inQueue = true;
 				continue;
 			}
 		$new[] = $value;
+		}
+		if($inQueue === false) {
+			throw new \RuntimeException("task cannot be removed, not in queue");
 		}
 		$this->tasks = $new;
 		if(empty($this->tasks)) {

@@ -286,6 +286,18 @@ final class RoundRobinTest extends TestCase {
 		$rr->remove($count);
 	}
 
+	function testRemoveNotInQueue() {
+		$rr = new RoundRobin();
+		$ts = new Timeshare();
+		$to = new TimeshareObservers();
+		$count0 = new TaskEnvelope($ts, new Counter(15), $to);
+		$count1 = new TaskEnvelope($ts, new Counter(20), $to);
+		$rr->add($count0);
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("task cannot be removed, not in queue");
+		$rr->remove($count1);
+	}
+
 	function testIterate(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
