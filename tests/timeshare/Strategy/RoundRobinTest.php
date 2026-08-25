@@ -2,11 +2,24 @@
 declare(strict_types=1);
 namespace plibv4\process;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+
 final class RoundRobinTest extends TestCase {
 	function testConstruct(): void {
 		$rr = new RoundRobin();
 		$this->assertInstanceOf(RoundRobin::class, $rr);
 		$this->assertSame(null, TestHelper::getPropertyValue($rr, "pointer"));
+	}
+
+	function testIsEmpty(): void {
+		$rr = new RoundRobin();
+		$this->assertTrue($rr->isEmpty());
+
+		$ts = new Timeshare();
+		$to = new TimeshareObservers();
+		$task = new TaskEnvelope($ts, new Counter(15), $to);
+		$rr->add($task);
+		$this->assertFalse($rr->isEmpty());
 	}
 	
 	function testAdd(): void {
@@ -60,6 +73,13 @@ final class RoundRobinTest extends TestCase {
 		$this->assertSame($count0, $rr->getCurrent());
 	}
 
+	function testGetCurrentEmpty(): void {
+		$rr = new RoundRobin();
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("no tasks in queue");
+		$rr->getCurrent();
+	}
+
 	function testIncrement(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
@@ -81,6 +101,13 @@ final class RoundRobinTest extends TestCase {
 		$this->assertSame($count1, $rr->getCurrent());
 		$rr->increment();
 		$this->assertSame($count2, $rr->getCurrent());
+	}
+
+	function testIncrementEmpty(): void {
+		$rr = new RoundRobin();
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("no tasks in queue");
+		$rr->increment();
 	}
 
 	function testGetCurrentIncrement(): void {
@@ -247,7 +274,18 @@ final class RoundRobinTest extends TestCase {
 		$this->assertSame(0, TestHelper::getPropertyValue($rr, "pointer"));
 		$this->assertSame($count0, $rr->getCurrent());
 	}
-	
+
+	function testRemoveEmpty() {
+		$rr = new RoundRobin();
+		$ts = new Timeshare();
+		$to = new TimeshareObservers();
+		$count = new TaskEnvelope($ts, new Counter(15), $to);
+
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage("no tasks in queue");
+		$rr->remove($count);
+	}
+
 	function testIterate(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();

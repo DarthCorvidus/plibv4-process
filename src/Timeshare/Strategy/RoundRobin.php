@@ -26,7 +26,7 @@ class RoundRobin implements Strategy {
 	#[\Override]
 	public function getCurrent(): TaskEnvelope {
 		if($this->pointer === null) {
-			throw new \RuntimeException("no current task");
+			throw new \RuntimeException("no tasks in queue");
 		}
 		return $this->tasks[$this->pointer];
 	}
@@ -41,7 +41,7 @@ class RoundRobin implements Strategy {
 	#[\Override]
 	public function increment(): void {
 		if($this->pointer === null) {
-			throw new \RuntimeException("pointer unexpectedly null");
+			throw new \RuntimeException("no tasks in queue");
 		}
 		if($this->pointer == $this->count - 1) {
 			$this->pointer = 0;
@@ -55,9 +55,6 @@ class RoundRobin implements Strategy {
 	}
 
 	private function modifyPointer(int $key): void {
-		if($this->pointer === null) {
-			throw new \RuntimeException("pointer unexpectedly null");
-		}
 		if($this->pointer>$key) {
 			$this->pointer--;
 		}
@@ -68,6 +65,9 @@ class RoundRobin implements Strategy {
 	
 	#[\Override]
 	public function remove(TaskEnvelope $task): void {
+		if($this->pointer === null) {
+			throw new \RuntimeException("no tasks in queue");
+		}
 		$new = array();
 		foreach($this->tasks as $key => $value) {
 			if($value === $task) {
