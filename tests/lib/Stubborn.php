@@ -14,6 +14,7 @@ final class Stubborn implements Task {
 
 	#[\Override]
 	public function __tsLoop(Scheduler $sched): bool {
+		usleep(1000);
 		return true;
 	}
 
