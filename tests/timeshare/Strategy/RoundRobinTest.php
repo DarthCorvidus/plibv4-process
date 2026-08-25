@@ -275,7 +275,7 @@ final class RoundRobinTest extends TestCase {
 		$this->assertSame($count0, $rr->getCurrent());
 	}
 
-	function testRemoveEmpty() {
+	function testRemoveEmpty(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();
@@ -286,7 +286,7 @@ final class RoundRobinTest extends TestCase {
 		$rr->remove($count);
 	}
 
-	function testRemoveNotInQueue() {
+	function testRemoveNotInQueue(): void {
 		$rr = new RoundRobin();
 		$ts = new Timeshare();
 		$to = new TimeshareObservers();

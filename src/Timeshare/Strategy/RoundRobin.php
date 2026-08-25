@@ -56,6 +56,12 @@ class RoundRobin implements Strategy {
 
 	private function modifyPointer(int $key): void {
 		if($this->pointer>$key) {
+			/** 
+			 * Psalm is right-ish here. modifyPointer is never called  if $this->pointer
+			 * is null, and could not be tested if and exception was thrown here.
+			 * Supressing the error seems to be the least painful option
+			 * @psalm-suppress PossiblyNullOperand 
+			 */
 			$this->pointer--;
 		}
 		if($this->pointer == $this->count - 1 ) {
